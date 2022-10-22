@@ -1,0 +1,34 @@
+Mongoose
+----------
+
+Mongoose is a library provided by mongoDb for easy DB interactivity especially for node.js applications
+
+Mongoose  provides necessary methods in Mongoose object to createDB, define Schema, model the schema, run queries etc.,
+
+First step:
+
+npm install Mongoose
+
+step 2:
+
+import mongoose wherever we're using DB Connect and schema/model creation
+
+Connect DB:
+ import mongoose
+ connect to DB - refer to /backend/data/config/server.js
+
+ Create Schema:
+
+ - import mongoose
+
+ const schemaName = mongoose.Schema({
+     //schema Data in json
+     // refer to /models/* for more info on schema
+ })
+
+ Create Model:
+
+  const modelName = mongoose.model('CollectionName',schemaName)
+
+
+
