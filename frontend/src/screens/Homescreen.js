@@ -5,36 +5,33 @@ import {Row,Col} from 'react-bootstrap'
 import Product from '../components/Product'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
-// *--Before Redux=>** import axios from 'axios'
-import  {listProducts}  from '../actions/productListActions'
-
+import { getAllSlots } from '../actions/CalendarActions';
 const Homescreen = () => {
    
-   const dispatch = useDispatch() // function to choose the list of available dispatch methods created in actions. productListActions in this case
-
-   const productList = useSelector(state=>state.productList)
-
-
-   const {products,loading,error} = productList
+   const dispatch = useDispatch()
+   const userid = useSelector(state => state.userLogin.userInfo.id)
 
    
 
     useEffect(()=>{
-       // dispatch(listProducts())
+        dispatch(getAllSlots(userid))
     
-    },[dispatch]) //[] dependency array if we need options on useEffect
+    },[dispatch])
 
 
    
     return (
         <>
          <h1> Dashboard</h1> 
-         {loading?<Loader>Loading....</Loader>:error?<Message>{error}</Message>:
          <Row>
          This is Dashboard page
+         {/* 
+         add a hyperlink to calendar page
+         */}
+         <Col>
+            <a href="/calendar">Calendar</a>
+         </Col>
         </Row>
-
-         }
             
             
         </>

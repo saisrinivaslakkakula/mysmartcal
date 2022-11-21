@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 @RestController
 @RequestMapping("/api/calendar")
@@ -23,7 +24,8 @@ public class calendarController {
             return new ResponseEntity<>(calendarService.addVacantSlot(calendarSlotRequestBody.getCalendarSlot(),calendarSlotRequestBody.getUserId()), HttpStatus.CREATED);
         }
         catch (Exception e) {
-            String s = "Internal Server Error. Please try again later.";
+            // return exception message back to client
+            String s = e.getMessage();
             return new ResponseEntity<>(s, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
@@ -55,10 +57,11 @@ public class calendarController {
 
     }
 
-    @PostMapping("/freelancerEditVacantSlot")
-    public Object FreelancerEditVacantSlot(@RequestBody AddVacantCalendarSlotRequestBody calendarSlotRequestBody) {
+    @GetMapping("/freelancerEditVacantSlot")
+    public Object FreelancerEditVacantSlot(@RequestParam(value="userId") String userId,@RequestParam(value="slotId") String slotId,@RequestParam(value="fromTime") String fromTime,@RequestParam(value="toTime") String toTime) {
         try {
-            return new ResponseEntity<>(calendarService.FreelancerEditVacantSlot(calendarSlotRequestBody.getUserId(),calendarSlotRequestBody.getCalendarSlot()), HttpStatus.CREATED);
+            System.out.println("API CALLED");
+            return new ResponseEntity<>(calendarService.FreelancerEditVacantSlot(userId,slotId,fromTime,toTime), HttpStatus.CREATED);
         }
         catch (Exception e) {
             String s = "Already Vacant Slot exists at the requested time. Please check and edit the time.";
@@ -72,6 +75,11 @@ public class calendarController {
     @GetMapping("/getCalendarSlots")
     public ArrayList<CalendarSlot> getAllSlots( @RequestParam(value = "userId") String userId){
         return calendarService.getAllSlots(userId);
+    }
+
+    @DeleteMapping("/freelancerRemoveVacantSlot")
+    public Object freeLancerRemoveVacantSlot (@RequestParam(value = "userId") String userId, @RequestParam(value = "slotId") String slotId){
+        return calendarService.removeFreelancerVacantSlot(userId,slotId);
     }
 
 

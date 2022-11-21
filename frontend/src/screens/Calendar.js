@@ -10,10 +10,69 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { addVacantSlot, getAllSlots } from '../actions/CalendarActions';
+import { addVacantSlot, getAllSlots, removeVacantSlot,editVacantSlot } from '../actions/CalendarActions';
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 const CalendarScreen = () => {
+  // if not logged in redirect to login page
+  const userLogin = useSelector((state) => state.userLogin)
+  const { userInfo } = userLogin
+  if (!userInfo) {
+    window.location.href = '/login'
+  }
+  const times_array = [
+    "12:00 AM",
+    "1:00 AM",
+    "2:00 AM",
+    "3:00 AM",
+    "4:00 AM",
+    "5:00 AM",
+    "6:00 AM",
+    "7:00 AM",
+    "8:00 AM",
+    "9:00 AM",
+    "10:00 AM",
+    "11:00 AM",
+    "12:00 PM",
+    "1:00 PM",
+    "2:00 PM",
+    "3:00 PM",
+    "4:00 PM",
+    "5:00 PM",
+    "6:00 PM",
+    "7:00 PM",
+    "8:00 PM",
+    "9:00 PM",
+    "10:00 PM",
+    "11:00 PM",
+  ];
+  const times_map = {
+    "12:00 AM": 0,
+    "1:00 AM": 1,
+    "2:00 AM": 2,
+    "3:00 AM": 3,
+    "4:00 AM": 4,
+    "5:00 AM": 5,
+    "6:00 AM": 6,
+    "7:00 AM": 7,
+    "8:00 AM": 8,
+    "9:00 AM": 9,
+    "10:00 AM": 10,
+    "11:00 AM": 11,
+    "12:00 PM": 12,
+    "1:00 PM": 13,
+    "2:00 PM": 14,
+    "3:00 PM": 15,
+    "4:00 PM": 16,
+    "5:00 PM": 17,
+    "6:00 PM": 18,
+    "7:00 PM": 19,
+    "8:00 PM": 20,
+    "9:00 PM": 21,
+    "10:00 PM": 22,
+    "11:00 PM": 23,
+  };
+
 
   const [showModal, setShowModal] = useState(false)
   const [startDateForModal, setStartDateForModal] = useState('');
@@ -26,21 +85,37 @@ const CalendarScreen = () => {
   const AllSlots = useSelector(state => state.calendarSlots.calendarSlots)
   const [calendarSlotsState, setCalendarSlotsState] = useState(AllSlots);
   const [currentEventSelected, setCurrentEventSelected] = useState({});
+  const [deleteConfirmationModal, setDeleteConfirmationModal] = useState(false);
   const dispatch = useDispatch()
+  const calendarSlotsObj = useSelector(state => state.calendarSlots)
+ // console.log(calendarSlotsObj)
+  const { loading, error, calendarSlots } = calendarSlotsObj
+  
+
+  //console.log(calendarSlots)
   useEffect(() => {
-    dispatch(getAllSlots(userid))
-    setCalendarSlotsState(AllSlots)
+    //dispatch(getAllSlots(userid))
+    //setCalendarSlotsState(calendarSlots.calendarSlots)
 
 
-  }, [dispatch])
+  }, [dispatch,calendarSlots])
   const handleClose = () => {
+    setDeleteConfirmationModal(false)
+    setCurrentEventSelected(false)
     setShowModal(false)
   }
-  const handleAddSlots = () => {
+
+  const tst = async(slotDate,startTime,endTime)=>{
+    const isSlotAlreadyPresent = await calendarSlotsState.find((slot) => {
+      return slot.date === slotDate && (slot.fromTime <= startTime && slot.toTime >= startTime || slot.fromTime <= endTime && slot.toTime >= endTime)
+    })
+  }
+  const handleAddSlots = async() => {
     console.log("start Time", startTime);
     console.log("end Time", endTime);
     const calendarSlot = {
-      date: slotDate,
+      startdate: moment(slotDate).format("YYYY-MM-DD"),
+      endDate: moment(slotDate).format("YYYY-MM-DD"),
       fromTime: startTime,
       toTime: endTime,
       status: "Vacant",
@@ -50,9 +125,23 @@ const CalendarScreen = () => {
     handleClose();
   }
 
+  
+
   const handleEditSlots = () => {
-    console.log("start Time", startTime);
-    console.log("end Time", endTime);
+    dispatch(editVacantSlot(userid,currentEventSelected.slotId,startTime,endTime))
+    handleClose();
+  }
+
+  const handleDeleteSlotConfirmation = () => {
+    setShowModal(false)
+    setDeleteConfirmationModal(true)
+
+  }
+  const handleDeleteSlot = () => {
+    dispatch(removeVacantSlot(userid, currentEventSelected.slotId))
+    handleClose();
+    setCurrentEventSelected(false)
+    setDeleteConfirmationModal(false)
   }
   var state = {
     events: []
@@ -98,13 +187,14 @@ const CalendarScreen = () => {
   };
   return (
     <>
+    {error && <Message variant='danger'>{error}</Message>}
       <Container>
         <Row className="justify-content-md-center"></Row>
-        <DnDCalendar
+          <DnDCalendar
           dayLayoutAlgorithm={'no-overlap'}
           defaultDate={moment().toDate()}
           defaultView="month"
-          events={AllSlots}
+          events={calendarSlots}
           localizer={localizer}
           onEventDrop={onEventDrop}
           onEventResize={onEventResize}
@@ -132,10 +222,33 @@ const CalendarScreen = () => {
                       <h4 style={{ textTransform: 'capitalize' }}>{startDateForModal}</h4>
                       <div className='row'>
                         <div className='col-6'>
-                          <input type="text" name="startTime" defaultValue={currentEventSelected.fromTime} onChange={(e) => setStartTime(e.target.value)} placeholder="Enter Start Time Slot" />
+                         
+                          <select className="form-control" onChange={(e) => setStartTime(e.target.value)}>
+                           <option value={currentEventSelected.fromTime}>{currentEventSelected.fromTime}</option>
+                           {/* iterate over the times array and create options */}
+                           {times_array.map((time) => {
+                              return <option value={time}>{time}</option>
+                            }
+                            )}
+                          </select>
+                          
+
+                          
                         </div>
                         <div className='col-6'>
-                          <input type="text" name="endTime" defaultValue={currentEventSelected.toTime} onChange={(e) => setEndTime(e.target.value)} placeholder="Enter End Time Slot" />
+                         {/* 
+                         <input type="text" name="endTime" defaultValue={currentEventSelected.toTime} onChange={(e) => setEndTime(e.target.value)} placeholder="Enter End Time Slot" />
+                         */} 
+                          <select className="form-control" onChange={(e) => setEndTime(e.target.value)}>
+                          <option value={currentEventSelected.toTime}>{currentEventSelected.toTime}</option>
+                            
+                            {times_array.map((time) => {
+                              if (times_map[time] > times_map[startTime]) {
+                                return <option value={time}>{time}</option>
+                              }
+                            }
+                            )}
+                          </select>
                         </div>
                       </div>
                       <div className='row'>
@@ -154,10 +267,26 @@ const CalendarScreen = () => {
                       <h4 style={{ textTransform: 'capitalize' }}>{startDateForModal}</h4>
                       <div className='row'>
                         <div className='col-6'>
-                          <input type="text" name="startTime" onChange={(e) => setStartTime(e.target.value)} placeholder="Enter Start Time Slot" />
+                        <select className="form-control" onChange={(e) => setStartTime(e.target.value)}>
+                            <option value="">From Time</option>
+                           {/* iterate over the times array and create options */}
+                           {times_array.map((time) => {
+                              return <option value={time}>{time}</option>
+                            }
+                            )}
+                          </select>
                         </div>
                         <div className='col-6'>
-                          <input type="text" name="endTime" onChange={(e) => setEndTime(e.target.value)} placeholder="Enter End Time Slot" />
+                        <select className="form-control" onChange={(e) => setEndTime(e.target.value)}>
+                            <option value="">To Time</option>
+                            
+                            {times_array.map((time) => {
+                              if (times_map[time] > times_map[startTime]) {
+                                return <option value={time}>{time}</option>
+                              }
+                            }
+                            )}
+                          </select>
                         </div>
                       </div>
                       <div className='row'>
@@ -174,7 +303,7 @@ const CalendarScreen = () => {
             </Modal.Body>
             {currentEventSelected ?
               <Modal.Footer>
-                <Button variant="danger" onClick={handleClose}>
+                <Button variant="danger" onClick={() => handleDeleteSlotConfirmation()}>
                   Delete Slot
                 </Button>
                 <Button variant="dark" onClick={() => handleEditSlots()}>
@@ -193,6 +322,31 @@ const CalendarScreen = () => {
         </div>
 
       }
+      {deleteConfirmationModal &&
+        <div>
+          <Modal show={deleteConfirmationModal}>
+            <Modal.Header>
+              <h2> Delete Confirmation</h2>
+              <p style={{ marginLeft: '5%' }}><allIcons.GrFormClose onClick={handleClose}></allIcons.GrFormClose></p>
+            </Modal.Header>
+            <Modal.Body>
+              <div>
+                <h4>Are you sure you want to delete this slot?</h4>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button variant="danger" onClick={() => handleDeleteSlot()}>
+                Delete
+              </Button>
+              <Button variant="dark" onClick={() => handleClose()}>
+                Cancel
+              </Button>
+            </Modal.Footer>
+          </Modal>
+        </div>
+      }
+
+
     </>
   )
 }

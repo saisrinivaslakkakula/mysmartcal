@@ -17,6 +17,21 @@ public class calendarService {
         Calendar calendar = (Calendar) calendarRepository.findByUserId(userIdObject);
         if (calendar != null) {
             calendarSlot.setSlotId();
+            // check if slot with same date and time already exists. Also start time should not fall in between any other slot start and end time
+            ArrayList<CalendarSlot> vacantSlots = calendar.getVacantSlots();
+            for (CalendarSlot slot : vacantSlots) {
+                if (slot.getDate().equals(calendarSlot.getDate())) {
+                    if (slot.getFromTime().equals(calendarSlot.getFromTime()) || slot.getToTime().equals(calendarSlot.getToTime())) {
+                        throw new RuntimeException("Slot already exists");
+                    }
+                    if (slot.getFromTime().compareTo(calendarSlot.getFromTime()) < 0 && slot.getToTime().compareTo(calendarSlot.getFromTime()) > 0) {
+                        throw new RuntimeException("Slot already exists");
+                    }
+                    if (slot.getFromTime().compareTo(calendarSlot.getToTime()) < 0 && slot.getToTime().compareTo(calendarSlot.getToTime()) > 0) {
+                        throw new RuntimeException("Slot already exists");
+                    }
+                }
+            }
             calendar.getVacantSlots().add(calendarSlot);
         }
         else{
@@ -48,6 +63,7 @@ public class calendarService {
                 if (slot.getStatus().equals("Vacant")) {
                     // if the slot is vacant, then add the appointment to the appointments taken
                     Freelancercalendar.getAppointmentsGiven().add(calendarSlot);
+                    // kafka set status to pending
                     break;
                 }
                 else{
@@ -92,26 +108,35 @@ public class calendarService {
         calendarRepository.save(Freelancercalendar);
         return Freelancercalendar;
     }
-    public Calendar FreelancerEditVacantSlot(String userId, CalendarSlot calendarSlot){
-        // edit calendar slot time
+    public Calendar FreelancerEditVacantSlot(String userId, String slotId, String fromTime, String toTime){
+        // get user calendar by user id
         ObjectId userIdObject = new ObjectId(userId);
         Calendar calendar = (Calendar) calendarRepository.findByUserId(userIdObject);
-        // check if new  date and time is already added by checking all vacant slots in the calendar
+        // get the slot by slot id
+        System.out.println(slotId);
         for (CalendarSlot slot : calendar.getVacantSlots()) {
-            if(!slot.getSlotId().equals(calendarSlot.getSlotId()) && checkIfStartTimeFallsBetweenGivenStartAndEndTimes(calendarSlot.getFromTime(), calendarSlot.getToTime(),slot.getFromTime(), slot.getToTime())){
-                throw new RuntimeException("Time slot already exists. Please try again with new start and end times.");
-            }
-        }
-        // if new date and time is not added, then update the date and time of the slot in the calendar
-        for (CalendarSlot slot : calendar.getAppointmentsGiven()) {
-            if (slot.getSlotId().equals(calendarSlot.getSlotId())) {
-                slot.setDate(calendarSlot.getDate());
-                slot.setFromTime(calendarSlot.getFromTime());
-                slot.setToTime(calendarSlot.getToTime());
+            if (slot.getSlotId().equals(slotId)) {
+                // update the slot with the new from time and to time
+                // check if slot time falls in between any other slot time of same date
+                // if the slot id is same as the slot id passed in the request, then skip the check
+                for (CalendarSlot slot1 : calendar.getVacantSlots()) {
+                    if (slot1.getDate().equals(slot.getDate())) {
+                        if (slot1.getFromTime().compareTo(fromTime) < 0 && slot1.getToTime().compareTo(fromTime) > 0 && !slot1.getSlotId().equals(slotId)) {
+                            throw new RuntimeException("Slot already exists");
+                        }
+                        if (slot1.getFromTime().compareTo(toTime) < 0 && slot1.getToTime().compareTo(toTime) > 0 && !slot1.getSlotId().equals(slotId)) {
+                            throw new RuntimeException("Slot already exists");
+                        }
+                    }
+                }
+                slot.setFromTime(fromTime);
+                slot.setToTime(toTime);
             }
         }
         calendarRepository.save(calendar);
+        System.out.println(calendar.JSONString());
         return calendar;
+
     }
 
     boolean checkIfStartTimeFallsBetweenGivenStartAndEndTimes(String startTime,String endTime,String givenStartTime,String givenEndTime){
@@ -142,5 +167,14 @@ public class calendarService {
         // add all the appointments given to the calendarSlots array
         calendarSlots.addAll(calendar.getAppointmentsGiven());
         return calendarSlots;
+    }
+
+    public Object removeFreelancerVacantSlot(String userId, String slotId) {
+        // remove the slot from the calendar
+        ObjectId userIdObject = new ObjectId(userId);
+        Calendar calendar = (Calendar) calendarRepository.findByUserId(userIdObject);
+        calendar.getVacantSlots().removeIf(slot -> slot.getSlotId().equals(slotId));
+        calendarRepository.save(calendar);
+        return calendar;
     }
 }

@@ -12,7 +12,8 @@ public class CalendarSlot {
     @Id
     private String slotId;
     private String requestedUserId;
-    private String date;
+    private String startdate;
+    private String enddate;
     private String fromTime;
     private String toTime;
     private String status;
@@ -24,11 +25,12 @@ public class CalendarSlot {
     }
 
     public String getDate() {
-        return date;
+        return startdate;
     }
 
     public void setDate(String date) {
-        this.date = date;
+        this.startdate= date;
+        this.enddate= date;
     }
 
     public String getFromTime() {
