@@ -105,17 +105,10 @@ const CalendarScreen = () => {
     setShowModal(false)
   }
 
-  const tst = async(slotDate,startTime,endTime)=>{
-    const isSlotAlreadyPresent = await calendarSlotsState.find((slot) => {
-      return slot.date === slotDate && (slot.fromTime <= startTime && slot.toTime >= startTime || slot.fromTime <= endTime && slot.toTime >= endTime)
-    })
-  }
   const handleAddSlots = async() => {
-    console.log("start Time", startTime);
-    console.log("end Time", endTime);
     const calendarSlot = {
       startdate: moment(slotDate).format("YYYY-MM-DD"),
-      endDate: moment(slotDate).format("YYYY-MM-DD"),
+      enddate: moment(slotDate).format("YYYY-MM-DD"),
       fromTime: startTime,
       toTime: endTime,
       status: "Vacant",
@@ -177,8 +170,17 @@ const CalendarScreen = () => {
   };
 
   const eventStyleGetter = (event, start, end, isSelected) => {
-    var backgroundColor = '#f0f0f0';
+    //console.log(event)
+    const bg_colors_map = {
+      "Vacant": "#99ccff",
+      "Confirmed": "#00FF00",
+      "Pending": "#ffff00",
+    }
+    var backgroundColor = bg_colors_map[event.status];
+    const color = "black";
+    console.log(event)
     var style = {
+      color: color,
       backgroundColor: backgroundColor,
     };
     return {
@@ -200,6 +202,7 @@ const CalendarScreen = () => {
           onEventResize={onEventResize}
           onSelectEvent={handleSelectEvent}
           onSelectSlot={handleSelectSlot}
+          eventPropGetter={(eventStyleGetter)}
           resizable
           selectable
           style={{ maxWidth: "100%", padding: "30px", height: "80vh" }}
@@ -209,7 +212,8 @@ const CalendarScreen = () => {
         <div>
           <Modal show={showModal}>
             <Modal.Header>
-              <h2> Add Vacant Time Slots</h2>
+              {currentEventSelected?<h2>Edit {currentEventSelected.status} Slot</h2>:<h2> Add Vacant Time Slots</h2>}
+              
               <p style={{ marginLeft: '5%' }}><allIcons.GrFormClose onClick={handleClose}></allIcons.GrFormClose></p>
 
             </Modal.Header>

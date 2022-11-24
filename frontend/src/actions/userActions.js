@@ -1,4 +1,8 @@
-import {USER_LOGIN_REQUEST,USER_LOGIN_SUCCESS,USER_LOGIN_FAIL, USER_LOGOUT, USER_REGISTER_REQUEST, USER_REGISTER_SUCCESS, USER_REGISTER_FAIL, USER_DETAILS_REQUEST, USER_DETAILS_SUCCESS, USER_DETAILS_FAIL} from '../constants/userConstants'
+import {USER_LOGIN_REQUEST,USER_LOGIN_SUCCESS,
+    USER_LOGIN_FAIL, USER_LOGOUT, USER_REGISTER_REQUEST,
+     USER_REGISTER_SUCCESS, USER_REGISTER_FAIL, USER_DETAILS_REQUEST, 
+     USER_DETAILS_SUCCESS, USER_DETAILS_FAIL,
+    GET_USER_NOTIFICATIONS} from '../constants/userConstants'
 import axios from 'axios'
 export const login = (email,password) => async(dispatch) =>{
     try {
@@ -87,6 +91,20 @@ export const getUserDetails = (id) => async(dispatch,getState) =>{
             type:USER_DETAILS_FAIL,
             payload:error.response && error.response.data.message ? error.response.data.message: error.message
         }) 
+    }
+}
+
+export const getUserNotifications = (userId) => async(dispatch,getState) =>{
+    try {
+        const {data} = await axios.get(`api/user/getNotificationFromMongoDB?userId=${userId}`)
+        dispatch({
+            type:GET_USER_NOTIFICATIONS,
+            payload:data
+        })
+
+    }
+    catch(error){
+        console.log(error)
     }
 }
 

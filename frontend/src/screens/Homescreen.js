@@ -6,6 +6,7 @@ import Product from '../components/Product'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
 import { getAllSlots } from '../actions/CalendarActions';
+import { getUserNotifications } from '../actions/userActions';
 const Homescreen = () => {
    
    const dispatch = useDispatch()
@@ -15,6 +16,7 @@ const Homescreen = () => {
 
     useEffect(()=>{
         dispatch(getAllSlots(userid))
+       // dispatch(getUserNotifications(userid))
     
     },[dispatch])
 

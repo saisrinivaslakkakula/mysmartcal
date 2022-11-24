@@ -1,4 +1,7 @@
-import {USER_LOGIN_REQUEST,USER_LOGIN_SUCCESS,USER_LOGIN_FAIL,USER_LOGOUT, USER_REGISTER_REQUEST, USER_REGISTER_SUCCESS, USER_REGISTER_FAIL, USER_DETAILS_REQUEST, USER_DETAILS_SUCCESS, USER_DETAILS_FAIL} from '../constants/userConstants'
+import {USER_LOGIN_REQUEST,USER_LOGIN_SUCCESS,USER_LOGIN_FAIL,USER_LOGOUT, USER_REGISTER_REQUEST, USER_REGISTER_SUCCESS, USER_REGISTER_FAIL, USER_DETAILS_REQUEST, 
+    USER_DETAILS_SUCCESS, USER_DETAILS_FAIL,
+    GET_USER_NOTIFICATIONS
+} from '../constants/userConstants'
 const userLoginReducer = (state = {},action) =>{
 
     switch(action.type){
@@ -49,4 +52,15 @@ const userDetailsReducer = (state = {user:{}},action) =>{
 
 }
 
-export {userLoginReducer,userRegisterReducer,userDetailsReducer}
+const userNotificationsReducer= ()=>(state = {notifications:[]},action) =>{
+    switch(action.type){
+        case GET_USER_NOTIFICATIONS:
+            console.log("Payload Notifications",action.payload)
+            return({loading:false,notifications:action.payload})
+        default:
+            return state
+    }
+
+}
+
+export {userLoginReducer,userRegisterReducer,userDetailsReducer,userNotificationsReducer}

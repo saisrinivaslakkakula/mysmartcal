@@ -25,6 +25,8 @@ public class userService {
             throw new RuntimeException("User already exists");
         }
         Calendar calendar = new Calendar();
+        user.setNotifications(new ArrayList<>());
+        user.setMessages(new ArrayList<>());
         userRepository.save(user);
         Optional<User> createdUser = userRepository.findByEmail(user.getEmail());
         if (createdUser.isPresent()) {
@@ -77,6 +79,15 @@ public class userService {
         user1.setPassword(user.getPassword());
         userRepository.save(user1);
         return user1;
+    }
+
+    public ArrayList<NotificationMessage> getNotificationFromMongoDB(String userId) {
+        Optional<User> userOptional = userRepository.findById(userId);
+        if (!userOptional.isPresent()) {
+            throw new RuntimeException("User does not exist");
+        }
+        User user = userOptional.get();
+        return (ArrayList<NotificationMessage>) user.getNotifications();
     }
 }
 

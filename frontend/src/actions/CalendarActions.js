@@ -1,4 +1,4 @@
-import { CALENDAR_ADD_SLOT, CALENDAR_REMOVE_SLOT, CALENDAR_GET_ALL_SLOTS, CALENDAR_ADD_SLOT_REQUEST, CALENDAR_ADD_SLOT_SUCCESS, CALENDAR_ADD_SLOT_FAIL, CALENDAR_EDIT_VACANT_SLOT_REQUEST, CALENDAR_EDIT_VACANT_SLOT_SUCCESS, CALENDAR_EDIT_VACANT_SLOT_FAIL } from '../constants/calendarConstants'
+import { CALENDAR_ADD_SLOT, CALENDAR_REMOVE_SLOT, CALENDAR_GET_ALL_SLOTS, CALENDAR_ADD_SLOT_REQUEST, CALENDAR_ADD_SLOT_SUCCESS, CALENDAR_ADD_SLOT_FAIL, CALENDAR_EDIT_VACANT_SLOT_REQUEST, CALENDAR_EDIT_VACANT_SLOT_SUCCESS, CALENDAR_EDIT_VACANT_SLOT_FAIL, FREELANCER_APPROVE_SLOT, FREELANCER_REJECT_SLOT } from '../constants/calendarConstants'
 import axios from 'axios'
 export const getAllSlots = (userId) => async (dispatch, getState) => {
     console.log("userId", userId);
@@ -108,4 +108,24 @@ catch (error) {
 }
 //console.log("Local", getState())
 localStorage.setItem('calendarSlots', JSON.stringify(getState().calendarSlots.calendarSlots))
+}
+
+export const freeLancerApproveSlot = (slotId,userId,freelancerId) => async (dispatch, getState) => {
+    const { data } = await axios.get(`api/calendar/freeLancerApproveAppointment?userId= ${userId}&slotId=${slotId}&freelancerId=${freelancerId}`)
+    console.log("data",data);
+    dispatch({
+        type: FREELANCER_APPROVE_SLOT,
+        payload: data
+    })
+    getAllSlots(userId)(dispatch, getState)
+}
+
+export const freeLancerRejectSlot = (slotId,userId,freelancerId) => async (dispatch, getState) => {
+    const { data } = await axios.get(`api/calendar/freeLancerRejectAppointment?userId= ${userId}&slotId=${slotId}&freelancerId=${freelancerId}`)
+    //console.log("data",data);
+    dispatch({
+        type: FREELANCER_REJECT_SLOT,
+        payload: data
+    })
+    getAllSlots(userId)(dispatch, getState)
 }

@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -57,5 +58,9 @@ public class userController {
             String s = "Internal Server Error. Please try again later.";
             return new ResponseEntity<>(s, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+    }
+    @GetMapping("/getNotificationFromMongoDB")
+    public ArrayList<NotificationMessage> getNotificationFromMongoDB(@RequestParam(value = "userId") String userId){
+        return userService.getNotificationFromMongoDB(userId);
     }
 }

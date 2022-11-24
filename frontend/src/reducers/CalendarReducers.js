@@ -1,4 +1,4 @@
-import { CALENDAR_ADD_SLOT, CALENDAR_REMOVE_SLOT, CALENDAR_GET_ALL_SLOTS, CALENDAR_ADD_SLOT_SUCCESS, CALENDAR_ADD_SLOT_REQUEST, CALENDAR_ADD_SLOT_FAIL, CALENDAR_EDIT_VACANT_SLOT_REQUEST,CALENDAR_EDIT_VACANT_SLOT_SUCCESS,CALENDAR_EDIT_VACANT_SLOT_FAIL } from '../constants/calendarConstants'
+import { CALENDAR_ADD_SLOT, CALENDAR_REMOVE_SLOT, CALENDAR_GET_ALL_SLOTS, CALENDAR_ADD_SLOT_SUCCESS, CALENDAR_ADD_SLOT_REQUEST, CALENDAR_ADD_SLOT_FAIL, CALENDAR_EDIT_VACANT_SLOT_REQUEST,CALENDAR_EDIT_VACANT_SLOT_SUCCESS,CALENDAR_EDIT_VACANT_SLOT_FAIL, FREELANCER_APPROVE_SLOT, FREELANCER_REJECT_SLOT } from '../constants/calendarConstants'
 import moment from "moment";
 /*export const calendarReducer = (state = { calendarSlots: [] }, action) => {
     switch (action.type) {
@@ -61,6 +61,8 @@ export const calendarReducer = (state = { calendarSlots: [] }, action) => {
                     end: moment(allSlots[i].date).format("YYYY-MM-DD"),
                     fromTime: allSlots[i].fromTime,
                     toTime: allSlots[i].toTime,
+                    status: allSlots[i].status
+
                 }
                 calendarSlotsArray.push(event)
             }
@@ -75,6 +77,10 @@ export const calendarReducer = (state = { calendarSlots: [] }, action) => {
             return { loading: false, calendarSlots: action.payload.calendarSlots }
         case CALENDAR_EDIT_VACANT_SLOT_FAIL:
             return { loading: false, error: action.payload }
+        case FREELANCER_APPROVE_SLOT:
+            return { loading: false, calendarSlots: action.payload.calendarSlots }
+        case FREELANCER_REJECT_SLOT:
+            return { loading: false, calendarSlots: action.payload.calendarSlots }
         default:
             return state
     }

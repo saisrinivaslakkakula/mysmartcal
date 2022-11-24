@@ -1,10 +1,14 @@
 package com.mysmartcal.backend.calander;
+import com.mysmartcal.backend.User.NotificationMessage;
+import com.mysmartcal.backend.User.User;
 import com.mysmartcal.backend.User.userRepository;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @AllArgsConstructor
@@ -52,33 +56,106 @@ public class calendarService {
 
     }
 
-    public Calendar UserRequestAppintment(CalendarSlot calendarSlot, String userId, String freelancerId) {
+    public Calendar UserRequestAppintment(CalendarSlot calendarSlot, String userId, String freelancerId, NotificationMessage notificationMessage) {
         ObjectId freeLancerIdObject = new ObjectId(freelancerId);
         ObjectId userIdObject = new ObjectId(userId);
         Calendar Freelancercalendar = (Calendar) calendarRepository.findByUserId(freeLancerIdObject);
         Calendar Usercalendar = (Calendar) calendarRepository.findByUserId(userIdObject);
+        Optional<User> freelancer = userRepository.findById(String.valueOf(freeLancerIdObject));
+        boolean FreelancerAddedTemporaryAppointmentGiven = false;
+        boolean UserAddedTemporaryAppointmentTaken = false;
+
+
         // check if the slot is vacant in the calendar by checking the status of the slot in vacant slots
         for (CalendarSlot slot : Freelancercalendar.getVacantSlots()) {
             if (slot.getSlotId().equals(calendarSlot.getSlotId())) {
                 if (slot.getStatus().equals("Vacant")) {
-                    // if the slot is vacant, then add the appointment to the appointments taken
-                    Freelancercalendar.getAppointmentsGiven().add(calendarSlot);
-                    // kafka set status to pending
-                    break;
+                    calendarSlot.setStatus("Pending");
+                    calendarSlot.setRequestedUserId(userId);
+                    // if appointments given is null then create a new arraylist
+                    if (Freelancercalendar.getAppointmentsGiven() == null) {
+                        Freelancercalendar.setAppointmentsGiven(new ArrayList<>());
+                    }
+                    if(Freelancercalendar.getAppointmentsGiven().add(calendarSlot)) FreelancerAddedTemporaryAppointmentGiven = true;
+                    // if appointmentsTaken is null, create a new arraylist and add the appointment
+                    if(Usercalendar.getAppointmentsTaken() == null) {
+                        Usercalendar.setAppointmentsTaken(new ArrayList<>());
+                    }
+                    if(Usercalendar.getAppointmentsTaken().add(calendarSlot)) UserAddedTemporaryAppointmentTaken = true;
+                    // if both the boolean values are true then save the calendar
+                    if(FreelancerAddedTemporaryAppointmentGiven && UserAddedTemporaryAppointmentTaken){
+                        calendarRepository.save(Freelancercalendar);
+                        calendarRepository.save(Usercalendar);
+                        List<NotificationMessage> notificationMessages = freelancer.get().getNotifications();
+                        if (notificationMessages == null) {
+                            notificationMessages = new ArrayList<>();
+                        }
+                        notificationMessages.add(notificationMessage);
+                        freelancer.get().setNotifications(notificationMessages);
+                        userRepository.save(freelancer.get());
+                    }
+                    //else throw an exception
+                    else{
+                        throw new RuntimeException("Error in booking the appointment");
+                    }
                 }
-                else{
-                    // if the slot is not vacant, then return null
-                    return null;
-                }
-            }
+           }
         }
-        Usercalendar.getAppointmentsTaken().add(calendarSlot);
-        calendarRepository.save(Usercalendar);
-        calendarRepository.save(Freelancercalendar);
         return Freelancercalendar;
-
     }
 
+    public Calendar FreelancerDeleteAppointment(CalendarSlot calendarSlot, String userId, String freelancerId, NotificationMessage notificationMessage) {
+        ObjectId freeLancerIdObject = new ObjectId(freelancerId);
+        ObjectId userIdObject = new ObjectId(userId);
+        Calendar Freelancercalendar = (Calendar) calendarRepository.findByUserId(freeLancerIdObject);
+        Calendar Usercalendar = (Calendar) calendarRepository.findByUserId(userIdObject);
+        Optional<User> freelancer = userRepository.findById(String.valueOf(freeLancerIdObject));
+        boolean freelancerAppointmentDeleted = false;
+        boolean userAppointmentDeleted = false;
+        boolean freelancerVacantSlotCreatedBack = false;
+
+
+        // remove the appointment from the freelancer's calendar in appointments given
+        // remove the appointment from the user's calendar in appointments taken
+        // add the slot back to the freelancer's calendar in vacant slots
+        for (CalendarSlot slot : Freelancercalendar.getAppointmentsGiven()) {
+            if (slot.getSlotId().equals(calendarSlot.getSlotId())) {
+                if(Freelancercalendar.getAppointmentsGiven().remove(slot)) freelancerAppointmentDeleted = true;
+                if(Freelancercalendar.getVacantSlots().add(slot)) freelancerVacantSlotCreatedBack = true;
+                break;
+            }
+        }
+        for (CalendarSlot slot : Usercalendar.getAppointmentsTaken()) {
+            if (slot.getSlotId().equals(calendarSlot.getSlotId())) {
+                if(Usercalendar.getAppointmentsTaken().remove(slot)) userAppointmentDeleted = true;
+                break;
+            }
+        }
+        // notify the user that the appointment has been cancelled
+        List<NotificationMessage> notifications = freelancer.get().getNotifications();
+        // if notifications is null, create a new list and add the notification
+        if (notifications == null) {
+            notifications = new ArrayList<>();
+            notifications.add(notificationMessage);
+        }
+        else {
+            notifications.add(notificationMessage);
+        }
+        //save the notification in the freelancer's notifications
+        // if all the operations are successful, save the calendar else throw an exception
+        if (freelancerAppointmentDeleted && userAppointmentDeleted && freelancerVacantSlotCreatedBack) {
+            freelancer.get().setNotifications(notifications);
+            userRepository.save(freelancer.get());
+            calendarRepository.save(Usercalendar);
+            calendarRepository.save(Freelancercalendar);
+            return Freelancercalendar;
+        }
+        else{
+            throw new RuntimeException("Error in deleting appointment");
+        }
+
+
+    }
 
     public Calendar FreelancerEditAppintment(ObjectId calendarSlotId, String userId, String freelancerId, String status) {
         ObjectId freeLancerIdObject = new ObjectId(freelancerId);
@@ -176,5 +253,88 @@ public class calendarService {
         calendar.getVacantSlots().removeIf(slot -> slot.getSlotId().equals(slotId));
         calendarRepository.save(calendar);
         return calendar;
+    }
+
+    public Object freeLancerApproveAppointment(String userId, String slotId, String freelancerId) {
+        ObjectId userIdObject = new ObjectId(userId.trim());
+        ObjectId freelancerIdObject = new ObjectId(freelancerId.trim());
+        Calendar calendar = (Calendar) calendarRepository.findByUserId(userIdObject);
+        Calendar freelancerCalendar = (Calendar) calendarRepository.findByUserId(freelancerIdObject);
+        Optional<User> freelancer = userRepository.findById(freelancerId.trim());
+        boolean FreelancerUpdated = false;
+        boolean UserUpdated = false;
+        // remove the slot from the freelancer calendar
+        // update the status of the slot in the user calendar to the status passed in the request
+        for (CalendarSlot slot : calendar.getAppointmentsTaken()) {
+            if (slot.getSlotId().trim().equals(slotId.trim())) {
+                slot.setStatus("Confirmed");
+                UserUpdated = true;
+                //System.out.println(slot.getSlotId()+"|"+slotId+"|"+slot.getStatus());
+            }
+        }
+        // update status of freelancer calendar as confirmed in appintments given
+        for (CalendarSlot slot : freelancerCalendar.getAppointmentsGiven()) {
+            System.out.println(slot.getSlotId()+"|"+slotId);
+            if (slot.getSlotId().trim().equals(slotId.trim())) {
+
+                slot.setStatus("Confirmed");
+                FreelancerUpdated = true;
+                System.out.println(slot.getStatus());
+            }
+        }
+        // remove the slot from the freelancer calendar
+        freelancerCalendar.getVacantSlots().removeIf(slot -> slot.getSlotId().trim().equals(slotId.trim()));
+        calendarRepository.save(calendar);
+        calendarRepository.save(freelancerCalendar);
+        //return freelancerCalendar;
+        // return success message to the client
+        if(FreelancerUpdated && UserUpdated){
+            // get freelancer notifications
+            List<NotificationMessage> notifications = freelancer.get().getNotifications();
+            // iterate through the notifications and remove the notification with the same slot id
+            notifications.removeIf(notification -> notification.getCalendarSlot().getSlotId().trim().equals(slotId.trim()));
+            userRepository.save(freelancer.get());
+            return "Appointment Confirmed";
+
+
+        }
+        else{
+            return "Appointment not confirmed";
+        }
+    }
+
+    public Object freeLancerRejectAppointment(String userId, String slotId, String freelancerId) {
+        ObjectId userIdObject = new ObjectId(userId.trim());
+        ObjectId freelancerIdObject = new ObjectId(freelancerId.trim());
+        Calendar calendar = (Calendar) calendarRepository.findByUserId(userIdObject);
+        Calendar freelancerCalendar = (Calendar) calendarRepository.findByUserId(freelancerIdObject);
+        Optional<User> freelancer = userRepository.findById(freelancerId.trim());
+        boolean FreelancerUpdated = false;
+        boolean UserUpdated = false;
+        // remove slot from freelancer appointments given
+        if(freelancerCalendar.getAppointmentsGiven().removeIf(slot -> slot.getSlotId().trim().equals(slotId.trim()))) FreelancerUpdated = true;
+        // romove slot from user appointments taken
+        if(calendar.getAppointmentsTaken().removeIf(slot -> slot.getSlotId().trim().equals(slotId.trim()))) UserUpdated = true;
+        // iterate through freelancer calendar vacant slots and update the status of the slot to Vacant
+        for (CalendarSlot slot : freelancerCalendar.getVacantSlots()) {
+            if (slot.getSlotId().trim().equals(slotId.trim())) {
+                slot.setStatus("Vacant");
+                FreelancerUpdated = true;
+            }
+        }
+
+        if(FreelancerUpdated && UserUpdated){
+            // get freelancer notifications
+            List<NotificationMessage> notifications = freelancer.get().getNotifications();
+            // iterate through the notifications and remove the notification with the same slot id
+            notifications.removeIf(notification -> notification.getCalendarSlot().getSlotId().trim().equals(slotId.trim()));
+            userRepository.save(freelancer.get());
+            return "Appointment Rejected";
+
+
+        }
+        else{
+            return "Appointment not Rejected";
+        }
     }
 }

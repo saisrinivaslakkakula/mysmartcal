@@ -1,21 +1,30 @@
 package com.mysmartcal.backend.calander;
 
+import com.mysmartcal.backend.User.NotificationMessage;
 import com.mysmartcal.backend.calander.RequestBodies.AddVacantCalendarSlotRequestBody;
 import com.mysmartcal.backend.calander.RequestBodies.FreelancerEditAppointment;
 import com.mysmartcal.backend.calander.RequestBodies.UserBookAppointmentSlotRequestBody;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.cors.CorsConfiguration;
 
 import java.util.ArrayList;
-import java.util.Calendar;
+import java.util.Collections;
+import java.util.Date;
+import java.util.Optional;
 
 @RestController
+@CrossOrigin(origins = "http://localhost:3000")
 @RequestMapping("/api/calendar")
 @AllArgsConstructor
 public class calendarController {
     private final calendarService calendarService;
+    @Autowired
+    private KafkaTemplate<String, NotificationMessage> kafkaTemplate;
 
     @PostMapping("/addVacantSlot")
     public Object addVacantSlot(@RequestBody AddVacantCalendarSlotRequestBody calendarSlotRequestBody) {
@@ -31,18 +40,66 @@ public class calendarController {
 
     }
 
-    @PostMapping("/userRequestAppointment")
-    public Object UserRequestAppintment(@RequestBody UserBookAppointmentSlotRequestBody UserBookAppointmentSlotRequestBody) {
+
+    @PostMapping("/userRequestAppointmentKafka")
+    public void notifyFreelancer(@RequestBody UserBookAppointmentSlotRequestBody UserBookAppointmentSlotRequestBody) {
         try {
-            return new ResponseEntity<>(calendarService.UserRequestAppintment(UserBookAppointmentSlotRequestBody.getCalendarSlot(),UserBookAppointmentSlotRequestBody.getUserId(),UserBookAppointmentSlotRequestBody.getFreelancerId()), HttpStatus.CREATED);
+            /* setting CORS */
+            CorsConfiguration configAutenticacao = new CorsConfiguration();
+            configAutenticacao.setAllowCredentials(false);
+            configAutenticacao.setAllowedOriginPatterns(Collections.singletonList("*"));
+
+            /* setting notification message */
+            NotificationMessage notificationMessage = new NotificationMessage();
+            notificationMessage.setSenderId(UserBookAppointmentSlotRequestBody.getUserId());
+            notificationMessage.setReceiverId(UserBookAppointmentSlotRequestBody.getFreelancerId());
+            notificationMessage.setNotificationType("Appointment Request");
+            notificationMessage.setCalendarSlot(UserBookAppointmentSlotRequestBody.getCalendarSlot());
+            notificationMessage.setDateTime(new Date());
+            String notificationText = "User " + UserBookAppointmentSlotRequestBody.getUserId() + " has requested an appointment with you on " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getStartdate() + " at " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getFromTime() + " to " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getToTime();
+            notificationMessage.setNotificationText(notificationText);
+
+            // call calendar service to add the appointment to the calendar. once the appointment is added, send the notification to the freelancer
+            calendarService.UserRequestAppintment(UserBookAppointmentSlotRequestBody.getCalendarSlot(),UserBookAppointmentSlotRequestBody.getUserId(),UserBookAppointmentSlotRequestBody.getFreelancerId(),notificationMessage);
+            kafkaTemplate.send("notification1", notificationMessage);
         }
         catch (Exception e) {
             String s = "Internal Server Error. Please try again later.";
             System.out.println(e.getMessage());
-            return new ResponseEntity<>(s, HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
     }
+
+    @PostMapping("/FreelancerDeleteAppointment")
+    public void notifyUser(@RequestBody UserBookAppointmentSlotRequestBody UserBookAppointmentSlotRequestBody) {
+        try {
+            /* setting CORS */
+            CorsConfiguration configAutenticacao = new CorsConfiguration();
+            configAutenticacao.setAllowCredentials(false);
+            configAutenticacao.setAllowedOriginPatterns(Collections.singletonList("*"));
+
+            /* setting notification message */
+            NotificationMessage notificationMessage = new NotificationMessage();
+            notificationMessage.setSenderId(UserBookAppointmentSlotRequestBody.getUserId());
+            notificationMessage.setReceiverId(UserBookAppointmentSlotRequestBody.getFreelancerId());
+            notificationMessage.setNotificationType("Appointment Delete");
+            notificationMessage.setCalendarSlot(UserBookAppointmentSlotRequestBody.getCalendarSlot());
+            notificationMessage.setDateTime(new Date());
+            String notificationText = "Freelancer " + UserBookAppointmentSlotRequestBody.getFreelancerId()+ " has deleted the appointment booked with you on " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getStartdate() + " at " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getFromTime() + " to " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getToTime()+". Please book another appointment.";
+            notificationMessage.setNotificationText(notificationText);
+
+            // call calendar service to add the appointment to the calendar. once the appointment is added, send the notification to the freelancer
+            calendarService.UserRequestAppintment(UserBookAppointmentSlotRequestBody.getCalendarSlot(),UserBookAppointmentSlotRequestBody.getUserId(),UserBookAppointmentSlotRequestBody.getFreelancerId(),notificationMessage);
+            kafkaTemplate.send("notification1", notificationMessage);
+        }
+        catch (Exception e) {
+            String s = "Internal Server Error. Please try again later.";
+            System.out.println(e.getMessage());
+        }
+
+    }
+
+
 
     @PostMapping("/freelancerEditAppointment")
     public Object FreelancerEditAppointment(@RequestBody FreelancerEditAppointment freelancerEditAppointment) {
@@ -81,6 +138,21 @@ public class calendarController {
     public Object freeLancerRemoveVacantSlot (@RequestParam(value = "userId") String userId, @RequestParam(value = "slotId") String slotId){
         return calendarService.removeFreelancerVacantSlot(userId,slotId);
     }
+
+    @GetMapping("/freeLancerApproveAppointment")
+    // pass the calendar slot id and the freelancer id and the user id
+    public Object freeLancerApproveAppointment (@RequestParam(value = "userId") String userId, @RequestParam(value = "slotId") String slotId, @RequestParam(value = "freelancerId") String freelancerId){
+       // System.out.println("API CALLED");
+        return calendarService.freeLancerApproveAppointment(userId,slotId,freelancerId);
+    }
+
+    @GetMapping("/freeLancerRejectAppointment")
+    // pass the calendar slot id and the freelancer id and the user id
+    public Object freeLancerRejectAppointment (@RequestParam(value = "userId") String userId, @RequestParam(value = "slotId") String slotId, @RequestParam(value = "freelancerId") String freelancerId){
+        // System.out.println("API CALLED");
+        return calendarService.freeLancerRejectAppointment(userId,slotId,freelancerId);
+    }
+
 
 
 
