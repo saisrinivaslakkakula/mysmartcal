@@ -5,6 +5,7 @@ import {Row,Col} from 'react-bootstrap'
 import Product from '../components/Product'
 import Loader from '../components/Loader'
 import Message from '../components/Message'
+import Dashboard from './Dashboard'
 import { getAllSlots } from '../actions/CalendarActions';
 import { getUserNotifications } from '../actions/userActions';
 const Homescreen = () => {
@@ -25,15 +26,16 @@ const Homescreen = () => {
     return (
         <>
          <h1> Dashboard</h1> 
-         <Row>
-         This is Dashboard page
+         {/* <Row>
+         {/* This is Dashboard page
          {/* 
          add a hyperlink to calendar page
          */}
-         <Col>
+         <Dashboard> </Dashboard>
+         {/* <Col>
             <a href="/calendar">Calendar</a>
          </Col>
-        </Row>
+        </Row> */}
             
             
         </>

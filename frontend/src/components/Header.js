@@ -65,96 +65,108 @@ const Header = () => {
   return (
     <header>
       <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
-        <Container>
-          <LinkContainer to="/">
-            <Navbar.Brand ><span><i className='fa fa-calendar'> &nbsp;</i></span>My Smart Cal</Navbar.Brand>
-          </LinkContainer>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Form inline className="ml-auto">
-              <FormControl type="text" placeholder="Search" className="mr-sm-2" />
-              <Button ><i className="fa fa-search"></i></Button>
-            </Form>
+        <Container style={{flexDirection: "column"}}>
+          <Row style={{width: "100%"}}>
+            <LinkContainer to="/">
+              <Navbar.Brand ><span><i className='fa fa-calendar'> &nbsp;</i></span>My Smart Cal</Navbar.Brand>
+            </LinkContainer>
+            <Navbar.Toggle aria-controls="basic-navbar-nav" />
+            <Navbar.Collapse id="basic-navbar-nav">
+              <Form inline className="ml-auto">
+                <FormControl type="text" placeholder="Search" className="mr-sm-2" />
+                <Button ><i className="fa fa-search"></i></Button>
+              </Form>
 
-            <Nav className="ml-auto">
-
-
-              {userInfo
-                ?
-                <>
-                  <SockJsClient
-                    url={SOCKET_URL}
-                    topics={['/topic/group']}
-                    onConnect={onConnected}
-                    onDisconnect={console.log("Disconnected!")}
-                    onMessage={msg => onMessageReceived(msg)}
-                    debug={false}
-
-                  />
-                  <NavDropdown title={
-                    <div>
-                      <i className="fa fa-bell" style={{ color: 'white', fontSize: '20px', marginTop: '10px', marginRight: '10px' }}></i>
-                      <NotificationBadge count={notificationCount} effect={Effect.SCALE} />
-
-                    </div>
-
-                  } >
-                    {
-                    messages.length>0?messages.map((message, index) => {
-                      return (
-                        <div>
-                          <NavDropdown.Item  className="text-wrap" key={index}>{
-                            <div>
-                              <Row>
-                                {message.notificationText}
-                              </Row>
-                              <Row>
-                                {message.notificationDate}
-                              </Row>
-                              <Row>
-                                <Button  variant="success" size="sm" onClick={() => {
-                                  handleNotificationClick(message,"Approve")
-                                }}>Approve</Button>
-                                <Button  className="col-sm-4" variant="danger" size="sm" onClick={() => {
-                                  
-                                  handleNotificationClick(message,"Reject")
-                                }}>Reject</Button>
-
-                              </Row>
-                              
-
-                          </div>}
-                          </NavDropdown.Item>
-                          <hr></hr>
-
-                        </div>
-                        
-                        
-                      )
-                    }):
-                    <NavDropdown.Item>no notifications</NavDropdown.Item>}
+              <Nav className="ml-auto">
 
 
-                  </NavDropdown>
-                  <NavDropdown title={<span> <i className='fa fa-user'></i></span>} id='user-name'>
-                    <LinkContainer to="/profile">
-                      <NavDropdown.Item>profile</NavDropdown.Item>
-                    </LinkContainer>
-                    <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
+                {userInfo
+                  ?
+                  <>
+                    <SockJsClient
+                      url={SOCKET_URL}
+                      topics={['/topic/group']}
+                      onConnect={onConnected}
+                      onDisconnect={console.log("Disconnected!")}
+                      onMessage={msg => onMessageReceived(msg)}
+                      debug={false}
 
-                  </NavDropdown>
-                </>
+                    />
+                    <NavDropdown title={
+                      <div>
+                        <i className="fa fa-bell" style={{ color: 'white', fontSize: '20px', marginTop: '10px', marginRight: '10px' }}></i>
+                        <NotificationBadge count={notificationCount} effect={Effect.SCALE} />
+
+                      </div>
+
+                    } >
+                      {
+                      messages.length>0?messages.map((message, index) => {
+                        return (
+                          <div>
+                            <NavDropdown.Item  className="text-wrap" key={index}>{
+                              <div>
+                                <Row>
+                                  {message.notificationText}
+                                </Row>
+                                <Row>
+                                  {message.notificationDate}
+                                </Row>
+                                <Row>
+                                  <Button  variant="success" size="sm" onClick={() => {
+                                    handleNotificationClick(message,"Approve")
+                                  }}>Approve</Button>
+                                  <Button  className="col-sm-4" variant="danger" size="sm" onClick={() => {
+                                    
+                                    handleNotificationClick(message,"Reject")
+                                  }}>Reject</Button>
+
+                                </Row>
+                                
+
+                            </div>}
+                            </NavDropdown.Item>
+                            <hr></hr>
+
+                          </div>
+                          
+                          
+                        )
+                      }):
+                      <NavDropdown.Item>no notifications</NavDropdown.Item>}
 
 
-                :
-                <LinkContainer to="/login">
-                  <Nav.Link ><i className='fas fa-user'></i>Sign in</Nav.Link>
-                </LinkContainer>
-              }
+                    </NavDropdown>
+                    <NavDropdown title={<span> <i className='fa fa-user'></i></span>} id='user-name'>
+                      <LinkContainer to="/profile">
+                        <NavDropdown.Item>profile</NavDropdown.Item>
+                      </LinkContainer>
+                      <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
+
+                    </NavDropdown>
+                  </>
 
 
+                  :
+                  <LinkContainer to="/login">
+                    <Nav.Link ><i className='fas fa-user'></i>Sign in</Nav.Link>
+                  </LinkContainer>
+                }
+
+
+              </Nav>
+            </Navbar.Collapse>
+          </Row>
+          <Row style={{width: "100%"}}>
+            <Nav>
+              <Nav.Item>
+                <Nav.Link href="/" style={{ paddingLeft: "10px", paddingRight: "10px" }}>Dashboard</Nav.Link>
+              </Nav.Item>
+              <Nav.Item>
+                <Nav.Link href="/calendar" style={{ paddingLeft: "10px", paddingRight: "10px" }}>Calendar</Nav.Link>
+              </Nav.Item>
             </Nav>
-          </Navbar.Collapse>
+          </Row>
         </Container>
       </Navbar>
     </header>
