@@ -63,4 +63,11 @@ public class userController {
     public ArrayList<NotificationMessage> getNotificationFromMongoDB(@RequestParam(value = "userId") String userId){
         return userService.getNotificationFromMongoDB(userId);
     }
+
+    @GetMapping("/freelancers")
+    public List<User> getAllFreeLancers(){
+
+        return userService.getAllFreelancers();
+
+    }
 }

@@ -17,6 +17,17 @@ public class userService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
+
+    public List<User> getAllFreelancers() {
+        List<User> usersList = userRepository.findAll();
+        List<User> freelancers = new ArrayList<>();
+        for(User user: usersList){
+            if(user.isFreelancer()){
+                freelancers.add(user);
+            }
+        }
+        return freelancers;
+    }
     public User addUser(User user) {
         // check if user already exists by email else throw exception
         System.out.println(user);

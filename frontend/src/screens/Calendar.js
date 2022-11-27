@@ -98,6 +98,7 @@ const CalendarScreen = () => {
     //setCalendarSlotsState(calendarSlots.calendarSlots)
 
 
+
   }, [dispatch,calendarSlots])
   const handleClose = () => {
     setDeleteConfirmationModal(false)

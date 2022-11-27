@@ -6,6 +6,8 @@ import CalendarScreen from './screens/Calendar'
 import Loginscreen from './screens/loginScreen'
 import Registerscreen from './screens/registerScreen'
 import ProfileScreen from './screens/profileScreen'
+import FreelancersScreen from "./screens/FreelancersScreen";
+import FreelancerScreen from "./screens/FreelancerScreen";
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 
 const App = () => {
@@ -19,6 +21,8 @@ const App = () => {
         <Route path='/register' component={Registerscreen}/> 
         <Route path='/profile' component={ProfileScreen}/> 
         <Route path='/calendar' component={CalendarScreen}/>
+        <Route path='/freelancers' component={FreelancersScreen}/>
+        <Route path='/freelancer/:id' component={FreelancerScreen}/>
         <Route path='/' component={Homescreen} exact/>
       </Container>
     </main>
