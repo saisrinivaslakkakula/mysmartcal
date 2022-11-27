@@ -2,7 +2,14 @@ import {USER_LOGIN_REQUEST,USER_LOGIN_SUCCESS,
     USER_LOGIN_FAIL, USER_LOGOUT, USER_REGISTER_REQUEST,
      USER_REGISTER_SUCCESS, USER_REGISTER_FAIL, USER_DETAILS_REQUEST, 
      USER_DETAILS_SUCCESS, USER_DETAILS_FAIL,
-    GET_USER_NOTIFICATIONS} from '../constants/userConstants'
+    GET_USER_NOTIFICATIONS,
+    FREELANCERS_LIST_REQUEST,
+    FREELANCERS_LIST_SUCCESS,
+    FREELANCERS_LIST_FAIL,
+    FREELANCER_DETAILS_REQUEST,
+    FREELANCER_DETAILS_SUCCESS,
+    FREELANCER_DETAILS_FAIL
+} from '../constants/userConstants'
 import axios from 'axios'
 export const login = (email,password) => async(dispatch) =>{
     try {
@@ -105,6 +112,64 @@ export const getUserNotifications = (userId) => async(dispatch,getState) =>{
     }
     catch(error){
         console.log(error)
+    }
+}
+
+export const getFreelancerDetails = (id) => async (dispatch, getState) => {
+
+    try{
+        dispatch({
+            type: FREELANCER_DETAILS_REQUEST
+        })
+
+        const {userLogin} = getState()
+        const {userInfo} = userLogin
+        const config = {
+            headers: {
+                'Content-Type':'application/json',
+                Authorization: `Bearer ${userInfo.token}`,
+            }
+        }
+
+        const { data } = await axios.get(`/api/user/profile?id=${id}`, config)
+        dispatch({
+            type: FREELANCER_DETAILS_SUCCESS,
+            payload: data
+        })
+    }catch(error){
+        dispatch({
+            type: FREELANCER_DETAILS_FAIL,
+            payload:error.response && error.response.data.message ? error.response.data.message: error.message
+        })
+    }
+}
+
+export const getAllFreelancers = () => async (dispatch, getState) => {
+    try{
+        dispatch({
+            type: FREELANCERS_LIST_REQUEST
+        })
+
+        const {userLogin} = getState()
+        const {userInfo} = userLogin
+        const config = {
+            headers: {
+                'Content-Type':'application/json',
+                Authorization: `Bearer ${userInfo.token}`,
+            }
+        }
+        const {data} = await axios.get(`/api/user/freelancers`,config)
+        dispatch({
+            type : FREELANCERS_LIST_SUCCESS,
+            payload:data,
+        })
+
+
+    }catch(error){
+        dispatch({
+            type:FREELANCERS_LIST_FAIL,
+            payload:error.response && error.response.data.message ? error.response.data.message: error.message
+        })
     }
 }
 
