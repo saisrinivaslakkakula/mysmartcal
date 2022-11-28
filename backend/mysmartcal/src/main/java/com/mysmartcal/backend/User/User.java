@@ -24,10 +24,11 @@ public class User {
     private Address address;
     private boolean isFreelancer;
     private Date dateOfBirth;
+    private String servicesOffered;
     private List<NotificationMessage> notifications;
     private List<NotificationMessage> messages;
 
-    public User(String firstName, String lastName, String email, String phoneNumber, String password, Address address, boolean isFreelancer, Date dateOfBirth, List<NotificationMessage> notifications, List<NotificationMessage> messages, String id, String imageUrl) {
+    public User(String firstName, String lastName, String email, String phoneNumber, String password, Address address, boolean isFreelancer, Date dateOfBirth, List<NotificationMessage> notifications, List<NotificationMessage> messages, String id, String imageUrl, String servicesOffered) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -40,6 +41,7 @@ public class User {
         this.messages = messages;
         this.id=id;
         this.imageUrl = imageUrl;
+        this.servicesOffered = servicesOffered;
     }
 
 
@@ -82,6 +84,14 @@ public class User {
 
     public void setAddress(Address address) {
         this.address = address;
+    }
+
+    public String getServicesOffered() {
+        return servicesOffered;
+    }
+
+    public void setServicesOffered(String servicesOffered) {
+        this.servicesOffered = servicesOffered;
     }
 
     public boolean isFreelancer() {

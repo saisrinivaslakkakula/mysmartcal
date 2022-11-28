@@ -18,7 +18,10 @@ const Freelancer = ({freelancer}) => {
                 </a>
             </Card.Body>
             <Card.Text as='div'>
-                <Rating rating={freelancer.rating} numreviews={freelancer.numReviews}/>
+                <Rating rating={'4.5'} numreviews={'5'}/>
+            </Card.Text>
+            <Card.Text as='div'>
+                {freelancer.servicesOffered} developer
             </Card.Text>
             <ListGroup variant='flush'>
                 <ListGroup.Item>

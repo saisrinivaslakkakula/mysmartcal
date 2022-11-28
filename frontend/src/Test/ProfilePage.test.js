@@ -4,18 +4,17 @@ import renderer from "react-test-renderer";
 import Enzyme from "enzyme";
 
 import Adapter from "enzyme-adapter-react-16";
-
-import ProfileScreen from '../screens/profileScreen'
+import UserProfileScreen from '../screens/UserProfileScreen'
 
 Enzyme.configure({ adapter: new Adapter() });
 
-it("render the ProfileScreen Page component correctly", () => {
-  const ProfileScreenComponent = renderer
+it("render the UserProfileScreen Page component correctly", () => {
+  const UserProfileScreenComponent = renderer
     .create(
       <Router>
-        <ProfileScreen />
+        <UserProfileScreen />
       </Router>
     )
     .toJSON();
-  expect(ProfileScreenComponent).toMatchSnapshot();
+  expect(UserProfileScreenComponent).toMatchSnapshot();
 });
