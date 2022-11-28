@@ -7,7 +7,6 @@ import Homescreen from './screens/Homescreen'
 import CalendarScreen from './screens/Calendar'
 import Loginscreen from './screens/loginScreen'
 import Registerscreen from './screens/registerScreen'
-import ProfileScreen from './screens/profileScreen'
 import UserProfileScreen from "./screens/UserProfileScreen";
 import FreelancersScreen from "./screens/FreelancersScreen";
 import FreelancerScreen from "./screens/FreelancerScreen";

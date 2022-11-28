@@ -12,6 +12,7 @@ import {
     FREELANCER_DETAILS_FAIL, USER_UPDATE_PROFILE_FAIL, USER_UPDATE_PROFILE_REQUEST, USER_UPDATE_PROFILE_SUCCESS
 } from '../constants/userConstants'
 import axios from 'axios'
+
 export const login = (email,password) => async(dispatch) =>{
     try {
         dispatch({
@@ -40,7 +41,7 @@ export const login = (email,password) => async(dispatch) =>{
     }
 }
 
-export const register = (firstName, lastName, email, phoneNumber, password, Address, isFreeLancer, imageUrl) => async(dispatch) =>{
+export const register = (firstName, lastName, email, phoneNumber, password, Address, isFreeLancer, imageUrl, servicesOffered) => async(dispatch) =>{
     try {
         dispatch({
             type:USER_REGISTER_REQUEST
@@ -51,7 +52,7 @@ export const register = (firstName, lastName, email, phoneNumber, password, Addr
             }
         }
         console.log(isFreeLancer)
-        const {data} = await axios.post('/api/user/add/',{firstName, lastName, email, phoneNumber,password, address:Address, isFreelancer:isFreeLancer, imageUrl},config)
+        const {data} = await axios.post('/api/user/add/',{firstName, lastName, email, phoneNumber,password, address:Address, isFreelancer:isFreeLancer, imageUrl, servicesOffered},config)
         
          dispatch({
             type : USER_REGISTER_SUCCESS,
@@ -116,7 +117,7 @@ export const getUserNotifications = (userId) => async(dispatch,getState) =>{
     }
 }
 
-export const userUpdateProfileAction = (id, firstName, lastName, email, password, imageUrl) => async (dispatch, getState) => {
+export const userUpdateProfileAction = (id, firstName, lastName, email, password, imageUrl, servicesOffered) => async (dispatch, getState) => {
     try{
         dispatch({
             type: USER_UPDATE_PROFILE_REQUEST
@@ -131,7 +132,7 @@ export const userUpdateProfileAction = (id, firstName, lastName, email, password
             }
         }
 
-        const { data } = await axios.put(`api/user/update/profile`, {id, firstName, lastName, email, password, imageUrl}, config)
+        const { data } = await axios.put(`api/user/update/profile`, {id, firstName, lastName, email, password, imageUrl, servicesOffered}, config)
 
         dispatch({
             type: USER_UPDATE_PROFILE_SUCCESS,

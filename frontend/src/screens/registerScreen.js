@@ -21,6 +21,7 @@ const RegisterScreen = ({ location, history }) => {
     const [city, setCity] = useState('')
     const [state, setState] = useState('')
     const [zipCode, setZipCode] = useState('')
+    const [servicesOffered, setServicesOffered] = useState('')
     const [isFreeLancer, setIsFreelancer] = useState(false)
     const [message, setMessage] = useState(null)
     const [image, setImage] = useState(null)
@@ -64,7 +65,7 @@ const RegisterScreen = ({ location, history }) => {
                 isFreeLancerBoolean = true
             }
 
-            dispatch(register(firstName, lastName, email, phoneNumber, password, Address, isFreeLancerBoolean, imageUrl))
+            dispatch(register(firstName, lastName, email, phoneNumber, password, Address, isFreeLancerBoolean, imageUrl, servicesOffered))
         }
 
     }
@@ -110,7 +111,7 @@ const RegisterScreen = ({ location, history }) => {
                     <Form.Label> Confirm Password:</Form.Label>
                     <Form.Control type="password" required placeholder="Confirm your pasword" vlaue={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)}></Form.Control>
                 </Form.Group>
-                <Form.Group controlId='StrretName'>
+                <Form.Group controlId='StreetName'>
                     <Form.Label> Address Line 1:</Form.Label>
                     <Form.Control type="text" required placeholder="Enter Street Name" vlaue={streetName} onChange={(e) => setStreetName(e.target.value)}></Form.Control>
                 </Form.Group>
@@ -138,8 +139,11 @@ const RegisterScreen = ({ location, history }) => {
                 <InputGroup className="mb-3">
                     <InputGroup.Text id="inputGroup-sizing-default">Are you a freelancer?</InputGroup.Text>
                     <InputGroup.Checkbox aria-label="Checkbox for following text input" onChange={(e) => setIsFreelancer(e.target.value)} />
-
                 </InputGroup>
+                { isFreeLancer && <Form.Group controlId='servicesOffered'>
+                    <Form.Label>Services Offered:</Form.Label>
+                    <Form.Control type='text' required placehoder="Services Offered" vlaue={servicesOffered} onChange={(e) => setServicesOffered(e.target.value)}></Form.Control>
+                </Form.Group>}
                 {message && <Message variant='danger'>{message}</Message>}
                 {error && <Message variant='danger'>{error}</Message>}
                 <Button type='submit' variant="primary">

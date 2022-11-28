@@ -41,10 +41,10 @@ const FreelancerScreen = ({match}) => {
                                 <h2>{freelancer.firstName}</h2>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                <Rating rating={freelancer.firstName} numreviews={freelancer.firstName}/>
+                                <Rating rating={'4.4'} numreviews={'5'}/>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Description: {freelancer.firstName}
+                                Description: {freelancer.servicesOffered}
                             </ListGroup.Item>
                             <ListGroup.Item>
                                 <Button className='btn-block' type='button'>

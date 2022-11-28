@@ -10,7 +10,7 @@ const FreelancersScreen = ({history}) => {
 
     const [query, setQuery] = useState("");
     const dispatch = useDispatch()
-    const keys = ["firstName", "lastName", "email"]
+    const keys = ["firstName", "lastName", "email", "servicesOffered"]
 
     const userLogin = useSelector(state => state.userLogin)
     const { userInfo } = userLogin
