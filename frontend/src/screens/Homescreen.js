@@ -2,28 +2,45 @@ import React, {useEffect} from 'react'
 import {useDispatch, useSelector} from 'react-redux'
 import Dashboard from './Dashboard'
 import { getAllSlots } from '../actions/CalendarActions';
+import { Container } from 'react-bootstrap';
+import {Row,Col } from 'react-bootstrap';
+import { Link } from 'react-router-dom';
 
 const Homescreen = () => {
    
-   const dispatch = useDispatch()
-   const userLogin = useSelector(state => state.userLogin)
-   const { userInfo } = userLogin
+   //const dispatch = useDispatch()
+   //const userid = useSelector(state => state.userLogin.userInfo.id)
 
-    if(!userInfo){
-        window.location.href = '/login'
-    }
+   
 
     useEffect(()=>{
-        dispatch(getAllSlots(userInfo.id))
+        //dispatch(getAllSlots(userid))
+       // dispatch(getUserNotifications(userid))
     
-    },[dispatch])
+    },[])
 
+    const divStyle = {
+        color: 'black',
+        marginLeft: '30%',
+        marginTop: '10%',
+      };
+      
 
    
     return (
         <>
-         <h1> Dashboard</h1>
-         <Dashboard />
+         {/* create a big heading called " Welcome to My Smart Cal" at the center of the screen */}
+         <h1 style={divStyle}>Welcome to My Smart Cal</h1>
+         
+            
+                <Link style={divStyle} to='/login'>Login</Link>  <br></br> <br></br>              
+                
+                <Link style={divStyle} to='/register'>Register</Link>               
+                
+         
+         
+            
+            
         </>
     )
 }

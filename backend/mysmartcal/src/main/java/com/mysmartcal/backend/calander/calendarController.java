@@ -57,8 +57,11 @@ public class calendarController {
             notificationMessage.setNotificationType("Appointment Request");
             notificationMessage.setCalendarSlot(UserBookAppointmentSlotRequestBody.getCalendarSlot());
             notificationMessage.setDateTime(new Date());
-            String notificationText = "User " + UserBookAppointmentSlotRequestBody.getUserId() + " has requested an appointment with you on " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getStartdate() + " at " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getFromTime() + " to " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getToTime();
+            String UserName = calendarService.getUserName(UserBookAppointmentSlotRequestBody.getUserId());
+
+            String notificationText = "User " + UserName + " has requested an appointment with you on " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getStartdate() + " at " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getFromTime() + " to " + UserBookAppointmentSlotRequestBody.getCalendarSlot().getToTime();
             notificationMessage.setNotificationText(notificationText);
+
 
             // call calendar service to add the appointment to the calendar. once the appointment is added, send the notification to the freelancer
             calendarService.UserRequestAppintment(UserBookAppointmentSlotRequestBody.getCalendarSlot(),UserBookAppointmentSlotRequestBody.getUserId(),UserBookAppointmentSlotRequestBody.getFreelancerId(),notificationMessage);
@@ -136,15 +139,35 @@ public class calendarController {
     }
 
     @DeleteMapping("/freelancerRemoveVacantSlot")
-    public Object freeLancerRemoveVacantSlot (@RequestParam(value = "userId") String userId, @RequestParam(value = "slotId") String slotId){
-        return calendarService.removeFreelancerVacantSlot(userId,slotId);
+    public Object freeLancerRemoveVacantSlot (@RequestParam(value = "userId") String userId, @RequestParam(value = "slotId") String slotId,@RequestParam(value="status") String status){
+        return calendarService.removeFreelancerVacantSlot(userId,slotId,status);
+    }
+
+    @DeleteMapping("/freelancerRemoveConfirmedSlot")
+    public Object freeLancerRemoveConfirmedSlot (@RequestParam(value = "userId") String userId, @RequestParam(value = "slotId") String slotId,@RequestParam(value="status") String status){
+        return calendarService.removeFreelancerconfirmedSlot(userId,slotId,status);
+    }
+    @DeleteMapping("/userRemoveConfirmedSlot")
+    public Object userRemoveConfirmedSlot (@RequestParam(value = "userId") String userId, @RequestParam(value = "slotId") String slotId,@RequestParam(value="status") String status){
+        return calendarService.removeUserconfirmedSlot(userId,slotId,status);
     }
 
     @GetMapping("/freeLancerApproveAppointment")
     // pass the calendar slot id and the freelancer id and the user id
     public Object freeLancerApproveAppointment (@RequestParam(value = "userId") String userId, @RequestParam(value = "slotId") String slotId, @RequestParam(value = "freelancerId") String freelancerId){
        // System.out.println("API CALLED");
-        return calendarService.freeLancerApproveAppointment(userId,slotId,freelancerId);
+        NotificationMessage notificationMessage = new NotificationMessage();
+        notificationMessage.setSenderId(freelancerId);
+        notificationMessage.setReceiverId(userId);
+        notificationMessage.setNotificationType("Appointment Confirm");
+        notificationMessage.setDateTime(new Date());
+        String FreelancerName = calendarService.getUserName(freelancerId);
+        //String SlotTimeForMEssage = calendarService.getSlotIdForMessage(userId,slotId);
+        String notificationText = "Freelancer " + FreelancerName + " has approved your appointment ";
+        notificationMessage.setNotificationText(notificationText);
+        //kafkaTemplate.send("notification1", notificationMessage);
+        return calendarService.freeLancerApproveAppointment(userId,slotId,freelancerId,notificationMessage);
+
     }
 
     @GetMapping("/freeLancerRejectAppointment")

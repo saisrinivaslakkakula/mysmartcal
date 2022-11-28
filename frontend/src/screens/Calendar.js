@@ -10,7 +10,7 @@ import Loader from '../components/Loader'
 import Message from '../components/Message'
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";
-import { addVacantSlot, getAllSlots, removeVacantSlot,editVacantSlot } from '../actions/CalendarActions';
+import { addVacantSlot, getAllSlots, removeVacantSlot,editVacantSlot, FreelancerremoveConfirmedSlot, UserremoveConfirmedSlot } from '../actions/CalendarActions';
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
 const CalendarScreen = () => {
@@ -94,12 +94,12 @@ const CalendarScreen = () => {
 
   //console.log(calendarSlots)
   useEffect(() => {
-    //dispatch(getAllSlots(userid))
+    dispatch(getAllSlots(userid))
     //setCalendarSlotsState(calendarSlots.calendarSlots)
 
 
 
-  }, [dispatch,calendarSlots])
+  }, [dispatch])
   const handleClose = () => {
     setDeleteConfirmationModal(false)
     setCurrentEventSelected(false)
@@ -132,7 +132,18 @@ const CalendarScreen = () => {
 
   }
   const handleDeleteSlot = () => {
-    dispatch(removeVacantSlot(userid, currentEventSelected.slotId))
+    if(currentEventSelected.status === "Vacant"){
+    dispatch(removeVacantSlot(userid, currentEventSelected.slotId,currentEventSelected.status))
+    }
+    else if(currentEventSelected.status === "Confirmed"){
+      if(userInfo.freelancer){
+        dispatch(FreelancerremoveConfirmedSlot(userid, currentEventSelected.slotId,currentEventSelected.status))
+      }
+      else{
+        dispatch(UserremoveConfirmedSlot(userid, currentEventSelected.slotId,currentEventSelected.status))
+      }
+     
+    }
     handleClose();
     setCurrentEventSelected(false)
     setDeleteConfirmationModal(false)
@@ -311,9 +322,11 @@ const CalendarScreen = () => {
                 <Button variant="danger" onClick={() => handleDeleteSlotConfirmation()}>
                   Delete Slot
                 </Button>
+                {currentEventSelected.status === "Vacant" &&
                 <Button variant="dark" onClick={() => handleEditSlots()}>
-                  Edit
-                </Button>
+                Edit
+              </Button>}
+                
               </Modal.Footer>
 
               :
