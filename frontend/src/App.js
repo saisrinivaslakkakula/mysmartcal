@@ -6,6 +6,7 @@ import CalendarScreen from './screens/Calendar'
 import Loginscreen from './screens/loginScreen'
 import Registerscreen from './screens/registerScreen'
 import ProfileScreen from './screens/profileScreen'
+import UserProfileScreen from "./screens/UserProfileScreen";
 import FreelancersScreen from "./screens/FreelancersScreen";
 import FreelancerScreen from "./screens/FreelancerScreen";
 import FreelancerCalendarScreen from "./screens/FreelancerCalendarScreen";
@@ -20,7 +21,7 @@ const App = () => {
         
         <Route path='/login' component={Loginscreen}/> 
         <Route path='/register' component={Registerscreen}/> 
-        <Route path='/profile' component={ProfileScreen}/> 
+        <Route path='/profile' component={UserProfileScreen}/>
         <Route path='/calendar' component={CalendarScreen}/>
         <Route path='/freelancers' component={FreelancersScreen}/>
         <Route path='/freelancer/:id' component={FreelancerScreen}/>

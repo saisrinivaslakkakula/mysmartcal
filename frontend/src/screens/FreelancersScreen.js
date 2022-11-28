@@ -25,7 +25,7 @@ const FreelancersScreen = ({history}) => {
 
     return(
         <>
-            <h1>Freelancers Page</h1>
+            <h1>Freelancers</h1>
             <Form>
                 <Form.Group className="md-6" controlId="formGroupSearch">
                     <Form.Control type="text" placeholder="Search..." onChange={(e) => setQuery(e.target.value.toLowerCase())}/>
