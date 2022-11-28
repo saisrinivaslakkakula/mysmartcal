@@ -19,7 +19,7 @@ const Header = ({history}) => {
   const { userInfo } = userLogin
   const logoutHandler = () => {
     dispatch(logout())
-    history.push('/')
+    //history.push('/')
   }
 
   const getAllPendingNotifications = async () => {
@@ -161,6 +161,10 @@ const Header = ({history}) => {
           {userInfo && (
             <Row style={{ width: "100%" }}>
               <Nav>
+                {userInfo.id && 
+                (<Nav.Item>
+                  <Nav.Link href="/chat" style={{ paddingLeft: "10px", paddingRight: "10px" }}>Messages</Nav.Link>
+                </Nav.Item>)}
                 {userInfo.freelancer ?
                   (<Nav.Item>
                     <Nav.Link href="/" style={{ paddingLeft: "10px", paddingRight: "10px" }}>Dashboard</Nav.Link>
