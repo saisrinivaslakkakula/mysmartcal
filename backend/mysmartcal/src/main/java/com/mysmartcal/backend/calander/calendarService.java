@@ -4,6 +4,8 @@ import com.mysmartcal.backend.User.User;
 import com.mysmartcal.backend.User.userRepository;
 import lombok.AllArgsConstructor;
 import org.bson.types.ObjectId;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -15,6 +17,8 @@ import java.util.Optional;
 public class calendarService {
     private final userRepository userRepository;
     private final calendarRepository calendarRepository;
+    @Autowired
+    private KafkaTemplate<String, NotificationMessage> kafkaTemplate;
     public Calendar addVacantSlot(CalendarSlot calendarSlot, String userId) {
         ObjectId userIdObject = new ObjectId(userId);
         System.out.println(calendarSlot);
@@ -36,6 +40,7 @@ public class calendarService {
                     }
                 }
             }
+            calendarSlot.setRequestedFreeLancerId(userId);
             calendar.getVacantSlots().add(calendarSlot);
         }
         else{
@@ -47,6 +52,7 @@ public class calendarService {
             calendarRepository.insert(calendarObj);
             Calendar calendarNew = (Calendar) calendarRepository.findByUserId(userIdObject);
             calendarSlot.setSlotId();
+            calendarSlot.setRequestedFreeLancerId(userId);
             calendarNew.getVacantSlots().add(calendarSlot);
             calendar = calendarNew;
         }
@@ -62,6 +68,9 @@ public class calendarService {
         Calendar Freelancercalendar = (Calendar) calendarRepository.findByUserId(freeLancerIdObject);
         Calendar Usercalendar = (Calendar) calendarRepository.findByUserId(userIdObject);
         Optional<User> freelancer = userRepository.findById(String.valueOf(freeLancerIdObject));
+        Optional<User> user = userRepository.findById(String.valueOf(userIdObject));
+        String FreelancerName = freelancer.get().getFirstName() + " " + freelancer.get().getLastName();
+        String UserName = user.get().getFirstName() + " " + user.get().getLastName();
         boolean FreelancerAddedTemporaryAppointmentGiven = false;
         boolean UserAddedTemporaryAppointmentTaken = false;
 
@@ -72,6 +81,7 @@ public class calendarService {
                 if (slot.getStatus().equals("Vacant")) {
                     calendarSlot.setStatus("Pending");
                     calendarSlot.setRequestedUserId(userId);
+                    calendarSlot.setRequestedFreeLancerId(freelancerId);
                     // if appointments given is null then create a new arraylist
                     if (Freelancercalendar.getAppointmentsGiven() == null) {
                         Freelancercalendar.setAppointmentsGiven(new ArrayList<>());
@@ -101,6 +111,10 @@ public class calendarService {
                 }
            }
         }
+        String message = "User " + UserName + " has requested an appointment with you on " + calendarSlot.getDate() + " from " + calendarSlot.getFromTime() + " to " + calendarSlot.getToTime();
+        notificationMessage.setNotificationType("Appointment Request");
+        notificationMessage.setNotificationText(message);
+        System.out.println(notificationMessage);
         return Freelancercalendar;
     }
 
@@ -246,8 +260,9 @@ public class calendarService {
         return calendarSlots;
     }
 
-    public Object removeFreelancerVacantSlot(String userId, String slotId) {
+    public Object removeFreelancerVacantSlot(String userId, String slotId, String status) {
         // remove the slot from the calendar
+        System.out.println("Remove Slot");
         ObjectId userIdObject = new ObjectId(userId);
         Calendar calendar = (Calendar) calendarRepository.findByUserId(userIdObject);
         calendar.getVacantSlots().removeIf(slot -> slot.getSlotId().equals(slotId));
@@ -255,12 +270,13 @@ public class calendarService {
         return calendar;
     }
 
-    public Object freeLancerApproveAppointment(String userId, String slotId, String freelancerId) {
+    public Object freeLancerApproveAppointment(String userId, String slotId, String freelancerId, NotificationMessage notificationMessage) {
         ObjectId userIdObject = new ObjectId(userId.trim());
         ObjectId freelancerIdObject = new ObjectId(freelancerId.trim());
         Calendar calendar = (Calendar) calendarRepository.findByUserId(userIdObject);
         Calendar freelancerCalendar = (Calendar) calendarRepository.findByUserId(freelancerIdObject);
         Optional<User> freelancer = userRepository.findById(freelancerId.trim());
+        Optional<User> user = userRepository.findById(userId.trim());
         boolean FreelancerUpdated = false;
         boolean UserUpdated = false;
         // remove the slot from the freelancer calendar
@@ -268,7 +284,16 @@ public class calendarService {
         for (CalendarSlot slot : calendar.getAppointmentsTaken()) {
             if (slot.getSlotId().trim().equals(slotId.trim())) {
                 slot.setStatus("Confirmed");
+                //notificationMessage.setNotificationText("Your appointment with "+freelancer.get().getFirstName()+" "+freelancer.get().getLastName()+" has been confirmed");
+                notificationMessage.setCalendarSlot(slot);
+                // add notification to the user
+                user.get().getNotifications().add(notificationMessage);
+                System.out.println("User Notification Added");
+                System.out.println(user.get().getNotifications().size());
+                kafkaTemplate.send("notification1", notificationMessage);
                 UserUpdated = true;
+                // send notification to the user using kafka
+
                 //System.out.println(slot.getSlotId()+"|"+slotId+"|"+slot.getStatus());
             }
         }
@@ -336,5 +361,73 @@ public class calendarService {
         else{
             return "Appointment not Rejected";
         }
+    }
+
+    public Object removeFreelancerconfirmedSlot(String userId, String slotId, String status) {
+        // remove the slot from the calendar
+        System.out.println("Remove Slot");
+        ObjectId userIdObject = new ObjectId(userId);
+        Calendar calendar = (Calendar) calendarRepository.findByUserId(userIdObject);
+        // iterate through the calendar slots and get get requestedUserId and slotId
+        for (CalendarSlot slot : calendar.getAppointmentsGiven()) {
+            if (slot.getSlotId().equals(slotId)) {
+                // get the user id of the user who requested the appointment
+                String requestedUserId = slot.getRequestedUserId();
+                System.out.println(requestedUserId);
+                Calendar requestedUserCalendar = (Calendar) calendarRepository.findByUserId(new ObjectId(requestedUserId));
+                // iterate through the requested user calendar and remove the slot from appointments taken
+                requestedUserCalendar.getAppointmentsTaken().removeIf(slot1 -> slot1.getSlotId().equals(slotId));
+                calendar.getAppointmentsGiven().removeIf(slot1 -> slot1.getSlotId().equals(slotId));
+                // add the slot to the vacant slots
+                slot.setStatus("Vacant");
+                slot.setRequestedFreeLancerId(null);
+                calendar.getVacantSlots().add(slot);
+                calendarRepository.save(calendar);
+                calendarRepository.save(requestedUserCalendar);
+            }
+        }
+        return calendar;
+    }
+
+    public Object removeUserconfirmedSlot(String userId, String slotId, String status) {
+        // remove the slot from the calendar
+        System.out.println("Remove Slot");
+        ObjectId userIdObject = new ObjectId(userId);
+        Calendar Usercalendar = (Calendar) calendarRepository.findByUserId(userIdObject);
+        // iterate through the calendar slots and get get requestedUserId and slotId
+        for (CalendarSlot slot : Usercalendar.getAppointmentsTaken()) {
+            if (slot.getSlotId().equals(slotId)) {
+                // get the user id of the user who requested the appointment
+                String requestedFreelancerId = slot.getRequestedFreeLancerId();
+                System.out.println(requestedFreelancerId);
+                Calendar FreelancerCalendar = (Calendar) calendarRepository.findByUserId(new ObjectId(requestedFreelancerId));
+                // iterate through the requested user calendar and remove the slot from appointments taken
+                FreelancerCalendar.getAppointmentsGiven().removeIf(slot1 -> slot1.getSlotId().equals(slotId));
+                Usercalendar.getAppointmentsTaken().removeIf(slot1 -> slot1.getSlotId().equals(slotId));
+                // add the slot to the vacant slots
+                slot.setStatus("Vacant");
+                slot.setRequestedFreeLancerId(null);
+                FreelancerCalendar.getVacantSlots().add(slot);
+                calendarRepository.save(Usercalendar);
+                calendarRepository.save(FreelancerCalendar);
+            }
+        }
+        return Usercalendar;
+    }
+
+    public String getUserName(String userId) {
+        Optional<User> user = userRepository.findById(userId);
+        return user.get().getFirstName() + " " + user.get().getLastName();
+    }
+
+    public String getSlotIdForMessage(String slotId, String id) {
+        ObjectId userIdObject = new ObjectId(id);
+        Calendar calendar = (Calendar) calendarRepository.findByUserId(userIdObject);
+        for (CalendarSlot slot : calendar.getAppointmentsTaken()) {
+            if (slot.getSlotId().equals(slotId)) {
+                return slot.getFromTime() + " - " + slot.getToTime();
+            }
+        }
+        return null;
     }
 }

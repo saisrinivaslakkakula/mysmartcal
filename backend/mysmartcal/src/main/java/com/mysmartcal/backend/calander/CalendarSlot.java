@@ -12,6 +12,44 @@ public class CalendarSlot {
     @Id
     private String slotId;
     private String requestedUserId;
+    private String requestedFreeLancerId;
+
+    public void setSlotId(String slotId) {
+        this.slotId = slotId;
+    }
+
+    public String getRequestedUserId() {
+        return requestedUserId;
+    }
+
+    public void setRequestedUserId(String requestedUserId) {
+        this.requestedUserId = requestedUserId;
+    }
+
+    public String getRequestedFreeLancerId() {
+        return requestedFreeLancerId;
+    }
+
+    public void setRequestedFreeLancerId(String requestedFreeLancerId) {
+        this.requestedFreeLancerId = requestedFreeLancerId;
+    }
+
+    public String getStartdate() {
+        return startdate;
+    }
+
+    public void setStartdate(String startdate) {
+        this.startdate = startdate;
+    }
+
+    public String getEnddate() {
+        return enddate;
+    }
+
+    public void setEnddate(String enddate) {
+        this.enddate = enddate;
+    }
+
     private String startdate;
     private String enddate;
     private String fromTime;
