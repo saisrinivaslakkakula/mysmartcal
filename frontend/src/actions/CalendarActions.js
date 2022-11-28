@@ -165,8 +165,7 @@ export const freeLancerApproveSlot = (slotId,userId,freelancerId) => async (disp
     getAllSlots(userId)(dispatch, getState)
 }
 
-export const userRequestAppointment = (calenderSlot ,userId,freelancerId) => async (dispatch, getState) => {
-    console.log("dispath here")
+export const userRequestAppointment = (calendarSlot ,userId,freelancerId) => async (dispatch, getState) => {
     const {userLogin} = getState()
     const {userInfo} = userLogin
 
@@ -177,7 +176,7 @@ export const userRequestAppointment = (calenderSlot ,userId,freelancerId) => asy
         }
     }
 
-    const { data } = await axios.post(`http://localhost:8080/api/calendar/userRequestAppointmentKafka`, { calenderSlot, userId, freelancerId }, config)
+    const { data } = await axios.post(`http://localhost:8080/api/calendar/userRequestAppointmentKafka`, { calendarSlot, userId, freelancerId }, config)
 
     dispatch({
         type: FREELANCER_REQUEST_SLOT,
