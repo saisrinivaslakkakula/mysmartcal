@@ -1,11 +1,14 @@
 import React, { useState, useEffect } from 'react'
 import { Link } from 'react-router-dom'
-import { Form, Button, Row, Col, InputGroup, FormControl } from 'react-bootstrap'
+import { Form, Button, Row, Col, InputGroup } from 'react-bootstrap'
 import { useDispatch, useSelector } from 'react-redux'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
-import { login, register } from '../actions/userActions'
+import { register } from '../actions/userActions'
 import FormContainer from '../components/formContainer'
+import axios from 'axios'
+import { Image } from 'cloudinary-react';
+
 const RegisterScreen = ({ location, history }) => {
     const [firstName, setFirstName] = useState('')
     const [lastName, setLastName] = useState('')
@@ -20,6 +23,8 @@ const RegisterScreen = ({ location, history }) => {
     const [zipCode, setZipCode] = useState('')
     const [isFreeLancer, setIsFreelancer] = useState(false)
     const [message, setMessage] = useState(null)
+    const [image, setImage] = useState(null)
+    const [imageUrl, setImageUrl] = useState('')
     const redirect = location.search ? location.search.split("=")[1] : '/'
     const dispatch = useDispatch()
     const states = ['Alabama', 'Alaska', 'American Samoa', 'Arizona', 'Arkansas', 'California', 'Colorado', 'Connecticut', 'Delaware', 'District of Columbia', 'Federated States of Micronesia', 'Florida', 'Georgia', 'Guam', 'Hawaii', 'Idaho', 'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana', 'Maine', 'Marshall Islands', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi', 'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey', 'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Northern Mariana Islands', 'Ohio', 'Oklahoma', 'Oregon', 'Palau', 'Pennsylvania', 'Puerto Rico', 'Rhode Island', 'South Carolina', 'South Dakota', 'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virgin Island', 'Virginia', 'Washington', 'West Virginia', 'Wisconsin', 'Wyoming']
@@ -31,6 +36,16 @@ const RegisterScreen = ({ location, history }) => {
             history.push(redirect)
         }
     }, [history, userInfo, redirect])
+
+    const uploadImage = async () => {
+        const formData = new FormData()
+        formData.append("file", image)
+        formData.append('upload_preset', 'mysmartcal')
+
+        await axios.post('https://api.cloudinary.com/v1_1/vschalamolu9/image/upload', formData).then((res) => {
+            setImageUrl(res.data.secure_url)
+        })
+    }
 
     const submitHandler = (e) => {
         e.preventDefault()
@@ -49,7 +64,7 @@ const RegisterScreen = ({ location, history }) => {
                 isFreeLancerBoolean = true
             }
 
-            dispatch(register(firstName, lastName, email, phoneNumber, password, Address, isFreeLancerBoolean))
+            dispatch(register(firstName, lastName, email, phoneNumber, password, Address, isFreeLancerBoolean, imageUrl))
         }
 
     }
@@ -60,6 +75,17 @@ const RegisterScreen = ({ location, history }) => {
             {error && <Message variant='danger'>{error}</Message>}
             {loading && <Loader></Loader>}
             <Form onSubmit={submitHandler}>
+                <br/>
+                {imageUrl && <Image style={{width: 200, marginLeft: 20}} cloudName='vschalamolu9' public_id={imageUrl}/>}
+                <br/>
+                <Form.Group controlId='image' as = {Row}>
+                    <Form.Control
+                        type='file'
+                        onChange={(e) => setImage(e.target.files[0])}
+                    />
+                    <Button style={{marginTop: 20}} type='btn' className='btn-block btn-dark' onClick={uploadImage}><b>Upload Profile Picture</b></Button>
+                </Form.Group>
+                <br/>
                 <Form.Group controlId='firstName'>
                     <Form.Label> First Name:</Form.Label>
                     <Form.Control type="name" required placeholder="Enter your first name" vlaue={firstName} onChange={(e) => setFirstName(e.target.value)}></Form.Control>

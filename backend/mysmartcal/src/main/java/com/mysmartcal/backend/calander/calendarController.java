@@ -49,6 +49,7 @@ public class calendarController {
             configAutenticacao.setAllowCredentials(false);
             configAutenticacao.setAllowedOriginPatterns(Collections.singletonList("*"));
 
+            System.out.println(UserBookAppointmentSlotRequestBody);
             /* setting notification message */
             NotificationMessage notificationMessage = new NotificationMessage();
             notificationMessage.setSenderId(UserBookAppointmentSlotRequestBody.getUserId());

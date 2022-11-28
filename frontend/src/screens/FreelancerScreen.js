@@ -45,7 +45,7 @@ const FreelancerScreen = ({match}) => {
                                 </Button>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                <Link to='/calendar'>
+                                <Link to= {`/freelancerCalendar/${match.params.id}`}>
                                     <Button className='btn-block' type='button'>
                                         Calendar
                                     </Button>

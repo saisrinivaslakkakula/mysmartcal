@@ -165,6 +165,10 @@ const Header = () => {
               <Nav.Item>
                 <Nav.Link href="/calendar" style={{ paddingLeft: "10px", paddingRight: "10px" }}>Calendar</Nav.Link>
               </Nav.Item>
+              <Nav.Item>
+                <Nav.Link href="/freelancers" style={{ paddingLeft: "10px", paddingRight: "10px" }}>Freelancers</Nav.Link>
+              </Nav.Item>
+
             </Nav>
           </Row>
         </Container>
