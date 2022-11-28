@@ -72,7 +72,7 @@ const UserProfileScreen = ({history}) => {
 
     return(
         <>
-            <h1>{user.firstName}'s Profile</h1>
+            <h1>{userInfo.firstName}'s Profile</h1>
             { loading ? <Loader /> : error ? <Message>{error}</Message> : (
                 <Row>
                     <Col>
