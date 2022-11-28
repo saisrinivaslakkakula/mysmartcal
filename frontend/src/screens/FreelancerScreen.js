@@ -11,6 +11,13 @@ const FreelancerScreen = ({match}) => {
 
     const dispatch = useDispatch()
 
+    const userLogin = useSelector(state => state.userLogin)
+    const { userInfo } = userLogin
+
+    if (!userInfo) {
+        window.location.href = '/login'
+    }
+
     useEffect(() => {
         dispatch(getFreelancerDetails(match.params.id))
     }, [dispatch, match])

@@ -72,14 +72,7 @@ const Header = () => {
             </LinkContainer>
             <Navbar.Toggle aria-controls="basic-navbar-nav" />
             <Navbar.Collapse id="basic-navbar-nav">
-              <Form inline className="ml-auto">
-                <FormControl type="text" placeholder="Search" className="mr-sm-2" />
-                <Button ><i className="fa fa-search"></i></Button>
-              </Form>
-
               <Nav className="ml-auto">
-
-
                 {userInfo
                   ?
                   <>

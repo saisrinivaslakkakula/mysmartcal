@@ -12,6 +12,13 @@ const FreelancersScreen = ({history}) => {
     const dispatch = useDispatch()
     const keys = ["firstName", "lastName", "email"]
 
+    const userLogin = useSelector(state => state.userLogin)
+    const { userInfo } = userLogin
+
+    if (!userInfo) {
+        window.location.href = '/login'
+    }
+
     useEffect(() => {
         dispatch(getAllFreelancers())
     }, [dispatch])

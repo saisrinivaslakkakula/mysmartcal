@@ -6,33 +6,24 @@ import { getAllSlots } from '../actions/CalendarActions';
 const Homescreen = () => {
    
    const dispatch = useDispatch()
-   const userid = useSelector(state => state.userLogin.userInfo.id)
+   const userLogin = useSelector(state => state.userLogin)
+   const { userInfo } = userLogin
 
-   
+    if(!userInfo){
+        window.location.href = '/login'
+    }
 
     useEffect(()=>{
-        dispatch(getAllSlots(userid))
-       // dispatch(getUserNotifications(userid))
+        dispatch(getAllSlots(userInfo.id))
     
-    },[dispatch, userid])
+    },[dispatch])
 
 
    
     return (
         <>
-         <h1> Dashboard</h1> 
-         {/* <Row>
-         {/* This is Dashboard page
-         {/* 
-         add a hyperlink to calendar page
-         */}
-         <Dashboard> </Dashboard>
-         {/* <Col>
-            <a href="/calendar">Calendar</a>
-         </Col>
-        </Row> */}
-            
-            
+         <h1> Dashboard</h1>
+         <Dashboard />
         </>
     )
 }
