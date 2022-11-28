@@ -11,6 +11,7 @@ import {getFreelancerVacantSlots, userRequestAppointment} from "../actions/Calen
 import {Link} from "react-router-dom";
 import Loader from "../components/Loader";
 import UserModal from "../components/UserModal"
+import {getFreelancerDetails} from "../actions/userActions";
 
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
@@ -26,8 +27,10 @@ const FreelancerCalendarScreen = ({match}) => {
     }
 
     const freelancerSlots = useSelector(state => state.freelancerSlots )
-
     const { loading, error, slots } = freelancerSlots
+
+    const freelancerDetails = useSelector(state => state.freelancerDetails)
+    const { freelancer } = freelancerDetails
 
     const [vacantSlots, setVacantSlots] = useState(slots?.filter((s) => s.status === "Vacant").map(s=>{
         s.start = moment(new Date(s.startdate)).add(1,'days').toDate()
@@ -44,6 +47,12 @@ const FreelancerCalendarScreen = ({match}) => {
     useEffect(() => {
         dispatch(getFreelancerVacantSlots(match.params.id))
     }, [match, dispatch])
+
+    useEffect(() => {
+        if(!freelancer){
+            dispatch(getFreelancerDetails(match.params.id));
+        }
+    },[])
 
     const [eventSelected, setEventSelected] = useState(false)
 
@@ -92,6 +101,7 @@ const FreelancerCalendarScreen = ({match}) => {
 
     return(
         <>
+            <h3>{freelancer.firstName}'s Calender</h3>
             <Link className='btn btn-light my-3' to='/freelancers'>
                 Go Back
             </Link>

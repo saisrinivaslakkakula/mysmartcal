@@ -8,7 +8,7 @@ const Freelancer = ({freelancer}) => {
     return (
         <Card className='my-3 p-3 rounded'>
             <a href = {`/freelancer/${freelancer.id}`}>
-                <Card.Img src = {freelancer.image} variant='top'/>
+                <Card.Img src = {freelancer.imageUrl} variant='top'/>
             </a>
             <Card.Body>
                 <a href = {`/freelancer/${freelancer.id}`}>
@@ -18,7 +18,10 @@ const Freelancer = ({freelancer}) => {
                 </a>
             </Card.Body>
             <Card.Text as='div'>
-                <Rating rating={freelancer.rating} numreviews={freelancer.numReviews}/>
+                <Rating rating={'4.5'} numreviews={'5'}/>
+            </Card.Text>
+            <Card.Text as='div'>
+                {freelancer.servicesOffered} developer
             </Card.Text>
             <ListGroup variant='flush'>
                 <ListGroup.Item>
