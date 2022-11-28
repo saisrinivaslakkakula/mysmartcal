@@ -12,6 +12,13 @@ const FreelancersScreen = ({history}) => {
     const dispatch = useDispatch()
     const keys = ["firstName", "lastName", "email"]
 
+    const userLogin = useSelector(state => state.userLogin)
+    const { userInfo } = userLogin
+
+    if (!userInfo) {
+        window.location.href = '/login'
+    }
+
     useEffect(() => {
         dispatch(getAllFreelancers())
     }, [dispatch])
@@ -25,7 +32,7 @@ const FreelancersScreen = ({history}) => {
 
     return(
         <>
-            <h1>Freelancers Page</h1>
+            <h1>Freelancers</h1>
             <Form>
                 <Form.Group className="md-6" controlId="formGroupSearch">
                     <Form.Control type="text" placeholder="Search..." onChange={(e) => setQuery(e.target.value.toLowerCase())}/>

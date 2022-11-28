@@ -85,9 +85,8 @@ public class userService {
         user1.setFirstName(user.getFirstName());
         user1.setEmail(user.getEmail());
         user1.setLastName(user.getLastName());
-        user1.setDateOfBirth(user.getDateOfBirth());
         user1.setPassword(user.getPassword());
-        user1.setPassword(user.getPassword());
+        user1.setImageUrl(user.getImageUrl());
         userRepository.save(user1);
         return user1;
     }

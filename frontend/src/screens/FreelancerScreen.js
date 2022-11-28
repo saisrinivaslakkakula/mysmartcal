@@ -11,6 +11,13 @@ const FreelancerScreen = ({match}) => {
 
     const dispatch = useDispatch()
 
+    const userLogin = useSelector(state => state.userLogin)
+    const { userInfo } = userLogin
+
+    if (!userInfo) {
+        window.location.href = '/login'
+    }
+
     useEffect(() => {
         dispatch(getFreelancerDetails(match.params.id))
     }, [dispatch, match])
@@ -26,7 +33,7 @@ const FreelancerScreen = ({match}) => {
             { loading ? <Loader /> : error ? <Message>{error}</Message> : (
                 <Row>
                     <Col md={6}>
-                        <Image src={freelancer.firstName} alt={freelancer.firstName} fluid/>
+                        <Image src={freelancer.imageUrl} alt={freelancer.firstName} fluid/>
                     </Col>
                     <Col md={6}>
                         <ListGroup variant='flush'>

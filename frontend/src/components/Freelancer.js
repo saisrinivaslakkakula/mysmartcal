@@ -8,7 +8,7 @@ const Freelancer = ({freelancer}) => {
     return (
         <Card className='my-3 p-3 rounded'>
             <a href = {`/freelancer/${freelancer.id}`}>
-                <Card.Img src = {freelancer.image} variant='top'/>
+                <Card.Img src = {freelancer.imageUrl} variant='top'/>
             </a>
             <Card.Body>
                 <a href = {`/freelancer/${freelancer.id}`}>

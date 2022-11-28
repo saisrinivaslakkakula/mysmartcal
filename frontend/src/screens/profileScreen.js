@@ -4,6 +4,9 @@ import {useDispatch,useSelector} from 'react-redux'
 import Message from '../components/Message'
 import Loader from '../components/Loader'
 import {getUserDetails} from '../actions/userActions'
+import { Image } from 'cloudinary-react'
+import axios from 'axios'
+
 const ProfileScreen = ({history}) => {
     const [name,setName] = useState('')
     const [email,setEmail] = useState('')
@@ -12,6 +15,8 @@ const ProfileScreen = ({history}) => {
     const [field4,setField4] = useState('')
     const [field5,setField5] = useState('')
     const [message,setMessage] = useState(null)
+    const [image, setImage] = useState(null)
+    const [imageUrl, setImageUrl] = useState(userInfo.imageUrl)
     const dispatch = useDispatch()
     const userDetails = useSelector(state => state.userDetails) 
     const {user,loading,error} = userDetails
@@ -24,7 +29,7 @@ const ProfileScreen = ({history}) => {
         else{
             
            if(!user.email){
-               dispatch(getUserDetails('profile'))
+               dispatch(getUserDetails(userInfo.id))
            }
            else{
             
@@ -33,6 +38,18 @@ const ProfileScreen = ({history}) => {
            }
         }
     },[dispatch,history,user,userInfo])
+
+    const uploadImage = async (e) => {
+        e.preventDefault()
+        const formData = new FormData()
+        formData.append("file", image)
+        formData.append('upload_preset', 'smartcal')
+
+        await axios.post('https://api.cloudinary.com/v1_1/vschalamolu9/image/upload', formData).then((res) => {
+            setImageUrl(res.data.secure_url)
+        })
+    }
+
     const submitHandler = (e)=>{
         e.preventDefault()
         if(password!== confirmPassword)
@@ -46,11 +63,21 @@ const ProfileScreen = ({history}) => {
         <Row>
             <Col md={3}>
             <h2>User Profile </h2>
+                <br/>
+                {imageUrl && <Image style={{width: 300, marginLeft: 20}} cloudName='vschalamolu9' public_id={imageUrl} fluid rounded/>}
             {message && <Message variant='danger'>{message}</Message>}
             {error&& <Message variant='danger'>{error}</Message>}
             {loading&& <Loader></Loader>}
             <Form onSubmit = {submitHandler}>
-            <Form.Group controlId='name'>
+                <Form.Group controlId='image' as = {Row}>
+                    <Form.Control
+                        type='file'
+                        onChange={(e) => setImage(e.target.files[0])}
+                    />
+                    <Button style={{marginTop: 20}} type='btn' className='btn-block btn-dark' onClick={uploadImage}><b>Upload Profile Picture</b></Button>
+                </Form.Group>
+                <br/>
+                <Form.Group controlId='name'>
                     <Form.Label> Name:</Form.Label>
                     <Form.Control type="name" placeholder="Enter your name" value={name} onChange={(e)=>setName(e.target.value)}></Form.Control>
                 </Form.Group>

@@ -40,7 +40,7 @@ const RegisterScreen = ({ location, history }) => {
     const uploadImage = async () => {
         const formData = new FormData()
         formData.append("file", image)
-        formData.append('upload_preset', 'mysmartcal')
+        formData.append('upload_preset', 'smartcal')
 
         await axios.post('https://api.cloudinary.com/v1_1/vschalamolu9/image/upload', formData).then((res) => {
             setImageUrl(res.data.secure_url)
