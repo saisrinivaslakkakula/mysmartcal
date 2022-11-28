@@ -1,3 +1,5 @@
+import React, { useEffect, useState } from 'react'
+import { useSelector, useDispatch } from 'react-redux'
 import Footer from './components/Footer'
 import Header from './components/Header'
 import {Container} from 'react-bootstrap'
@@ -9,9 +11,13 @@ import ProfileScreen from './screens/profileScreen'
 import FreelancersScreen from "./screens/FreelancersScreen";
 import FreelancerScreen from "./screens/FreelancerScreen";
 import FreelancerCalendarScreen from "./screens/FreelancerCalendarScreen";
+import Dashboard from './screens/Dashboard'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 
 const App = () => {
+  const userLogin = useSelector(state => state.userLogin)
+  const { userInfo } = userLogin
+  //const{freelancer} = userInfo
   return (
     <Router>
     <Header></Header>
@@ -25,7 +31,7 @@ const App = () => {
         <Route path='/freelancers' component={FreelancersScreen}/>
         <Route path='/freelancer/:id' component={FreelancerScreen}/>
         <Route path='/freelancerCalendar/:id' component={FreelancerCalendarScreen} />
-        <Route path='/' component={Homescreen} exact/>
+        {userInfo? userInfo.freelancer? <Route path='/' exact component={Dashboard}/> : <Route path='/' exact component={FreelancersScreen}/> : <Route path='/' exact component={Homescreen}/> }
       </Container>
     </main>
     <Footer/>

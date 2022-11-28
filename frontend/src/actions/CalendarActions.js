@@ -108,9 +108,31 @@ export const addVacantSlot = (userid, calendarSlot) => async (dispatch, getState
 
 
 
-export const removeVacantSlot = (userId, slotId) => async (dispatch, getState) => {
+export const removeVacantSlot = (userId, slotId,status) => async (dispatch, getState) => {
     //console.log("slotId",slotId);
-    const { data } = await axios.delete(`api/calendar/freelancerRemoveVacantSlot?userId=${userId}&slotId=${slotId}`)
+    const { data } = await axios.delete(`api/calendar/freelancerRemoveVacantSlot?userId=${userId}&slotId=${slotId}&status=${status}`)
+    //console.log("data",data);
+    dispatch({
+        type: CALENDAR_REMOVE_SLOT,
+        payload: slotId
+    })
+    getAllSlots(userId)(dispatch, getState)
+}
+
+export const FreelancerremoveConfirmedSlot = (userId, slotId,status) => async (dispatch, getState) => {
+    //console.log("slotId",slotId);
+    const { data } = await axios.delete(`api/calendar/freelancerRemoveConfirmedSlot?userId=${userId}&slotId=${slotId}&status=${status}`)
+    //console.log("data",data);
+    dispatch({
+        type: CALENDAR_REMOVE_SLOT,
+        payload: slotId
+    })
+    getAllSlots(userId)(dispatch, getState)
+}
+
+export const UserremoveConfirmedSlot = (userId, slotId,status) => async (dispatch, getState) => {
+    //console.log("slotId",slotId);
+    const { data } = await axios.delete(`api/calendar/userRemoveConfirmedSlot?userId=${userId}&slotId=${slotId}&status=${status}`)
     //console.log("data",data);
     dispatch({
         type: CALENDAR_REMOVE_SLOT,
