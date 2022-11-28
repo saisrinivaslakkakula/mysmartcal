@@ -8,7 +8,7 @@ const FreelancersList = ({freelancers}) => {
         <>
             { freelancers.map(freelancer => (
                 <Col sm={12} md={6} lg={4} xl={3}>
-                    <Freelancer freelancer={freelancer} />
+                    <Freelancer key = {freelancer.id} freelancer={freelancer} />
                 </Col>
             ))}
         </>

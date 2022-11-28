@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Line, Pie } from '@ant-design/charts';
+import { Pie } from '@ant-design/charts';
 import { Column } from '@ant-design/plots';
 import Container from "react-bootstrap/Container"
 import Row from 'react-bootstrap/Row';

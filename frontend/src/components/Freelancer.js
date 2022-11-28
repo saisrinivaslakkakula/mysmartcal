@@ -25,7 +25,7 @@ const Freelancer = ({freelancer}) => {
                     <Button className='btn-block' type='button'>Message</Button>
                 </ListGroup.Item>
                 <ListGroup.Item>
-                    <Link to='/calendar'>
+                    <Link to={`/freelancerCalendar/${freelancer.id}`}>
                         <Button className='btn-block' type='button'>Open Calender</Button>
                     </Link>
                 </ListGroup.Item>

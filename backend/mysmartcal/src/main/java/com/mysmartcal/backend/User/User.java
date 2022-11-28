@@ -17,6 +17,8 @@ public class User {
     private String lastName;
     private String email;
 
+    private String imageUrl;
+
     private String phoneNumber;
     private String password;
     private Address address;
@@ -25,7 +27,7 @@ public class User {
     private List<NotificationMessage> notifications;
     private List<NotificationMessage> messages;
 
-    public User(String firstName, String lastName, String email, String phoneNumber, String password, Address address, boolean isFreelancer, Date dateOfBirth, List<NotificationMessage> notifications, List<NotificationMessage> messages, String id) {
+    public User(String firstName, String lastName, String email, String phoneNumber, String password, Address address, boolean isFreelancer, Date dateOfBirth, List<NotificationMessage> notifications, List<NotificationMessage> messages, String id, String imageUrl) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
@@ -37,6 +39,7 @@ public class User {
         this.notifications = notifications;
         this.messages = messages;
         this.id=id;
+        this.imageUrl = imageUrl;
     }
 
 
@@ -107,6 +110,14 @@ public class User {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public String getImageUrl() {
+        return imageUrl;
+    }
+
+    public void setImageUrl(String imageUrl) {
+        this.imageUrl = imageUrl;
     }
 
     public List<NotificationMessage> getNotifications() {

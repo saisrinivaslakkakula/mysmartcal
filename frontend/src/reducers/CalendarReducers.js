@@ -1,4 +1,19 @@
-import { CALENDAR_ADD_SLOT, CALENDAR_REMOVE_SLOT, CALENDAR_GET_ALL_SLOTS, CALENDAR_ADD_SLOT_SUCCESS, CALENDAR_ADD_SLOT_REQUEST, CALENDAR_ADD_SLOT_FAIL, CALENDAR_EDIT_VACANT_SLOT_REQUEST,CALENDAR_EDIT_VACANT_SLOT_SUCCESS,CALENDAR_EDIT_VACANT_SLOT_FAIL, FREELANCER_APPROVE_SLOT, FREELANCER_REJECT_SLOT } from '../constants/calendarConstants'
+import {
+    CALENDAR_ADD_SLOT,
+    CALENDAR_REMOVE_SLOT,
+    CALENDAR_GET_ALL_SLOTS,
+    CALENDAR_ADD_SLOT_SUCCESS,
+    CALENDAR_ADD_SLOT_REQUEST,
+    CALENDAR_ADD_SLOT_FAIL,
+    CALENDAR_EDIT_VACANT_SLOT_REQUEST,
+    CALENDAR_EDIT_VACANT_SLOT_SUCCESS,
+    CALENDAR_EDIT_VACANT_SLOT_FAIL,
+    FREELANCER_APPROVE_SLOT,
+    FREELANCER_REJECT_SLOT,
+    FREELANCER_SLOTS_REQUEST,
+    FREELANCER_SLOTS_SUCCESS,
+    FREELANCER_SLOTS_FAIL, FREELANCER_REQUEST_SLOT
+} from '../constants/calendarConstants'
 import moment from "moment";
 /*export const calendarReducer = (state = { calendarSlots: [] }, action) => {
     switch (action.type) {
@@ -81,6 +96,23 @@ export const calendarReducer = (state = { calendarSlots: [] }, action) => {
             return { loading: false, calendarSlots: action.payload.calendarSlots }
         case FREELANCER_REJECT_SLOT:
             return { loading: false, calendarSlots: action.payload.calendarSlots }
+        case FREELANCER_REQUEST_SLOT:
+            return { loading: false, calendarSlots: action.payload.calendarSlots }
+        default:
+            return state
+    }
+
+}
+
+export const freelancerSlotsReducer = (state = {slots: []}, action) => {
+
+    switch (action.type){
+        case FREELANCER_SLOTS_REQUEST:
+            return { loading: true, slots: []}
+        case FREELANCER_SLOTS_SUCCESS:
+            return { loading: false, slots: action.payload }
+        case FREELANCER_SLOTS_FAIL:
+            return { loading: false, error: action.payload }
         default:
             return state
     }

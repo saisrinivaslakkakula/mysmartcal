@@ -30,6 +30,10 @@ public class Calendar {
         return userId;
     }
 
+    public String getUser_Id(){
+        return userId.toString();
+    }
+
     public ArrayList<CalendarSlot> getVacantSlots() {
         return vacantSlots;
     }

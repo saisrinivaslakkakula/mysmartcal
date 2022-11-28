@@ -84,7 +84,7 @@ const freelancerDetailsReducer = (state = {freelancer : {}}, action) => {
         case FREELANCER_DETAILS_SUCCESS:
             return ({loading: false, freelancer: action.payload})
         case FREELANCER_DETAILS_FAIL:
-            return ({loading: false, freelancer: action.payload})
+            return ({loading: false, error: action.payload})
         default:
             return state
     }
