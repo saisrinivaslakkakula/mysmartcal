@@ -1,9 +1,11 @@
-import React from 'react'
+import React,{useState} from 'react'
 import {Button, Card, ListGroup } from 'react-bootstrap'
 import Rating from "./Rating";
 import { Link } from 'react-router-dom'
 
+
 const Freelancer = ({freelancer}) => {
+    
 
     return (
         <Card className='my-3 p-3 rounded'>
@@ -22,7 +24,7 @@ const Freelancer = ({freelancer}) => {
             </Card.Text>
             <ListGroup variant='flush'>
                 <ListGroup.Item>
-                    <Button className='btn-block' type='button'>Message</Button>
+                    <Button className='btn-block' value={freelancer.id} type='button'>Message</Button>
                 </ListGroup.Item>
                 <ListGroup.Item>
                     <Link to={`/freelancerCalendar/${freelancer.id}`}>

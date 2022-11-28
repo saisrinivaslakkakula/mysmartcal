@@ -11,127 +11,154 @@ import {
     FREELANCER_DETAILS_SUCCESS,
     FREELANCER_DETAILS_FAIL, USER_UPDATE_PROFILE_FAIL, USER_UPDATE_PROFILE_REQUEST, USER_UPDATE_PROFILE_SUCCESS
 } from '../constants/userConstants'
+import { CometChat } from "@cometchat-pro/chat";
 import axios from 'axios'
-export const login = (email,password) => async(dispatch) =>{
+import { AUTH_KEY } from '../constants/ComeChatConstants';
+export const login = (email, password) => async (dispatch) => {
     try {
         dispatch({
-            type:USER_LOGIN_REQUEST
+            type: USER_LOGIN_REQUEST
         })
         const config = {
             headers: {
-                'Content-Type':'application/json'
+                'Content-Type': 'application/json'
             }
         }
         //console.log(config)
-        const {data} = await axios.post('/api/user/login',{email,password},config)
-        
-         dispatch({
-            type : USER_LOGIN_SUCCESS,
-            payload:data,
+        const { data } = await axios.post('/api/user/login', { email, password }, config)
+        CometChat.login(data.id, AUTH_KEY).then(
+            user => {
+              console.log("Login Successful:", { user });    
+            },
+            error => {
+              console.log("Login failed with exception:", { error });    
+            }
+          );
+
+        dispatch({
+            type: USER_LOGIN_SUCCESS,
+            payload: data,
         })
-        localStorage.setItem('userInfo',JSON.stringify(data)) 
-        
+        localStorage.setItem('userInfo', JSON.stringify(data))
+
     } catch (error) {
 
-         dispatch({
-            type:USER_LOGIN_FAIL,
-            payload:error.response && error.response.data.message ? error.response.data.message: error.message
-        }) 
+        dispatch({
+            type: USER_LOGIN_FAIL,
+            payload: error.response && error.response.data.message ? error.response.data.message : error.message
+        })
     }
 }
 
-export const register = (firstName, lastName, email, phoneNumber, password, Address, isFreeLancer, imageUrl) => async(dispatch) =>{
+export const register = (firstName, lastName, email, phoneNumber, password, Address, isFreeLancer, imageUrl) => async (dispatch) => {
     try {
         dispatch({
-            type:USER_REGISTER_REQUEST
+            type: USER_REGISTER_REQUEST
         })
         const config = {
             headers: {
-                'Content-Type':'application/json'
+                'Content-Type': 'application/json'
             }
         }
         console.log(isFreeLancer)
-        const {data} = await axios.post('/api/user/add/',{firstName, lastName, email, phoneNumber,password, address:Address, isFreelancer:isFreeLancer, imageUrl},config)
-        
-         dispatch({
-            type : USER_REGISTER_SUCCESS,
-            payload:data,
+        const { data } = await axios.post('/api/user/add/', { firstName, lastName, email, phoneNumber, password, address: Address, isFreelancer: isFreeLancer, imageUrl }, config)
+        var user = new CometChat.User(data.id);
+        const name = data.firstName + " " + data.lastName
+        user.setName(name);
+        CometChat.createUser(user, AUTH_KEY).then(
+            user => {
+                console.log("user created", user);
+                CometChat.login(data.id, AUTH_KEY).then(
+                    user => {
+                      console.log("Login Successful:", { user });    
+                    },
+                    error => {
+                      console.log("Login failed with exception:", { error });    
+                    }
+                  );
+            }, error => {
+                console.log("error", error);
+            }
+        )
+        dispatch({
+            type: USER_REGISTER_SUCCESS,
+            payload: data,
         })
         dispatch({
-            type : USER_LOGIN_SUCCESS,
-            payload:data,
+            type: USER_LOGIN_SUCCESS,
+            payload: data,
         })
-        localStorage.setItem('userInfo',JSON.stringify(data)) 
-        
+        localStorage.setItem('userInfo', JSON.stringify(data))
+
     } catch (error) {
 
-         dispatch({
-            type:USER_REGISTER_FAIL,
-            payload:error.response && error.response.data.message ? error.response.data.message: error.message
-        }) 
+        dispatch({
+            type: USER_REGISTER_FAIL,
+            payload: error.response && error.response.data.message ? error.response.data.message : error.message
+        })
     }
 }
 
-export const getUserDetails = (id) => async(dispatch,getState) =>{
+export const getUserDetails = (id) => async (dispatch, getState) => {
     try {
         dispatch({
-            type:USER_DETAILS_REQUEST
+            type: USER_DETAILS_REQUEST
         })
-     
-        const {userLogin} = getState()
-        const {userInfo} = userLogin
+
+        const { userLogin } = getState()
+        const { userInfo } = userLogin
         const config = {
             headers: {
-                'Content-Type':'application/json',
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${userInfo.token}`,
             }
         }
-        const {data} = await axios.get(`/api/user/profile?id=${id}`,config)
-         dispatch({
-            type : USER_DETAILS_SUCCESS,
-            payload:data,
+        const { data } = await axios.get(`/api/user/profile?id=${id}`, config)
+        dispatch({
+            type: USER_DETAILS_SUCCESS,
+            payload: data,
         })
-       
-        
+
+
     } catch (error) {
 
-         dispatch({
-            type:USER_DETAILS_FAIL,
-            payload:error.response && error.response.data.message ? error.response.data.message: error.message
-        }) 
+        dispatch({
+            type: USER_DETAILS_FAIL,
+            payload: error.response && error.response.data.message ? error.response.data.message : error.message
+        })
     }
 }
 
-export const getUserNotifications = (userId) => async(dispatch,getState) =>{
+export const getUserNotifications = (userId) => async (dispatch, getState) => {
     try {
-        const {data} = await axios.get(`api/user/getNotificationFromMongoDB?userId=${userId}`)
+        const { data } = await axios.get(`api/user/getNotificationFromMongoDB?userId=${userId}`)
         dispatch({
-            type:GET_USER_NOTIFICATIONS,
-            payload:data
+            type: GET_USER_NOTIFICATIONS,
+            payload: data
         })
 
     }
-    catch(error){
+    catch (error) {
         console.log(error)
     }
 }
 
 export const userUpdateProfileAction = (id, firstName, lastName, email, password, imageUrl) => async (dispatch, getState) => {
-    try{
+    try {
         dispatch({
             type: USER_UPDATE_PROFILE_REQUEST
         })
 
-        const {userLogin} = getState()
-        const {userInfo} = userLogin
+        const { userLogin } = getState()
+        const { userInfo } = userLogin
         const config = {
             headers: {
-                'Content-Type':'application/json',
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${userInfo.token}`,
             }
         }
 
-        const { data } = await axios.put(`api/user/update/profile`, {id, firstName, lastName, email, password, imageUrl}, config)
+        const { data } = await axios.put(`api/user/update/profile`, { id, firstName, lastName, email, password, imageUrl }, config)
 
         dispatch({
             type: USER_UPDATE_PROFILE_SUCCESS,
@@ -143,29 +170,29 @@ export const userUpdateProfileAction = (id, firstName, lastName, email, password
             payload: data
         })
 
-        localStorage.setItem('userInfo',JSON.stringify(data))
+        localStorage.setItem('userInfo', JSON.stringify(data))
 
     }
-    catch(error){
+    catch (error) {
         dispatch({
             type: USER_UPDATE_PROFILE_FAIL,
-            payload:error.response && error.response.data.message ? error.response.data.message: error.message
+            payload: error.response && error.response.data.message ? error.response.data.message : error.message
         })
     }
 }
 
 export const getFreelancerDetails = (id) => async (dispatch, getState) => {
 
-    try{
+    try {
         dispatch({
             type: FREELANCER_DETAILS_REQUEST
         })
 
-        const {userLogin} = getState()
-        const {userInfo} = userLogin
+        const { userLogin } = getState()
+        const { userInfo } = userLogin
         const config = {
             headers: {
-                'Content-Type':'application/json',
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${userInfo.token}`,
             }
         }
@@ -175,49 +202,49 @@ export const getFreelancerDetails = (id) => async (dispatch, getState) => {
             type: FREELANCER_DETAILS_SUCCESS,
             payload: data
         })
-    }catch(error){
+    } catch (error) {
         dispatch({
             type: FREELANCER_DETAILS_FAIL,
-            payload:error.response && error.response.data.message ? error.response.data.message: error.message
+            payload: error.response && error.response.data.message ? error.response.data.message : error.message
         })
     }
 }
 
 export const getAllFreelancers = () => async (dispatch, getState) => {
-    try{
+    try {
         dispatch({
             type: FREELANCERS_LIST_REQUEST
         })
 
-        const {userLogin} = getState()
-        const {userInfo} = userLogin
+        const { userLogin } = getState()
+        const { userInfo } = userLogin
         const config = {
             headers: {
-                'Content-Type':'application/json',
+                'Content-Type': 'application/json',
                 Authorization: `Bearer ${userInfo.token}`,
             }
         }
-        const {data} = await axios.get(`/api/user/freelancers`,config)
+        const { data } = await axios.get(`/api/user/freelancers`, config)
         dispatch({
-            type : FREELANCERS_LIST_SUCCESS,
-            payload:data,
+            type: FREELANCERS_LIST_SUCCESS,
+            payload: data,
         })
 
 
-    }catch(error){
+    } catch (error) {
         dispatch({
-            type:FREELANCERS_LIST_FAIL,
-            payload:error.response && error.response.data.message ? error.response.data.message: error.message
+            type: FREELANCERS_LIST_FAIL,
+            payload: error.response && error.response.data.message ? error.response.data.message : error.message
         })
     }
 }
 
 
 
-export const logout = () =>(dispatch)=>{
+export const logout = () => (dispatch) => {
     localStorage.removeItem('userInfo')
     localStorage.removeItem('calendarSlots')
     dispatch({
-        type:USER_LOGOUT
+        type: USER_LOGOUT
     })
 }
