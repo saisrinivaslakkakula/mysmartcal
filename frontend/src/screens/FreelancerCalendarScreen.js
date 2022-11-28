@@ -26,8 +26,10 @@ const FreelancerCalendarScreen = ({match}) => {
     }
 
     const freelancerSlots = useSelector(state => state.freelancerSlots )
-
     const { loading, error, slots } = freelancerSlots
+
+    const freelancerDetails = useSelector(state => state.freelancerDetails)
+    const { freelancer } = freelancerDetails
 
     const [vacantSlots, setVacantSlots] = useState(slots?.filter((s) => s.status === "Vacant").map(s=>{
         s.start = moment(new Date(s.startdate)).add(1,'days').toDate()
@@ -92,6 +94,7 @@ const FreelancerCalendarScreen = ({match}) => {
 
     return(
         <>
+            <h3>{freelancer.firstName}'s Calender</h3>
             <Link className='btn btn-light my-3' to='/freelancers'>
                 Go Back
             </Link>
