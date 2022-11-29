@@ -52,7 +52,7 @@ const FreelancerCalendarScreen = ({match}) => {
         if(!freelancer){
             dispatch(getFreelancerDetails(match.params.id));
         }
-    },[])
+    },[match, dispatch])
 
     const [eventSelected, setEventSelected] = useState(false)
 
