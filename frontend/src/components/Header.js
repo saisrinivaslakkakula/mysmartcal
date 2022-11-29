@@ -10,7 +10,7 @@ import axios from 'axios'
 import { freeLancerApproveSlot, freeLancerRejectSlot } from '../actions/CalendarActions'
 
 const SOCKET_URL = 'http://localhost:8080/ws-chat/';
-const Header = () => {
+const Header = ({history}) => {
   const [notificationCount, setNotificationCount] = useState(0);
   const [messages, setMessages] = useState([]);
   const userLogin = useSelector(state => state.userLogin)
@@ -19,6 +19,7 @@ const Header = () => {
   const { userInfo } = userLogin
   const logoutHandler = () => {
     dispatch(logout())
+    //history.push('/')
   }
 
   const getAllPendingNotifications = async () => {
@@ -139,7 +140,7 @@ const Header = () => {
                     </NavDropdown>
                     <NavDropdown title={<span> <i className='fa fa-user'></i></span>} id='user-name'>
                       <LinkContainer to="/profile">
-                        <NavDropdown.Item>profile</NavDropdown.Item>
+                        <NavDropdown.Item>Profile</NavDropdown.Item>
                       </LinkContainer>
                       <NavDropdown.Item onClick={logoutHandler}>Logout</NavDropdown.Item>
 
@@ -160,6 +161,10 @@ const Header = () => {
           {userInfo && (
             <Row style={{ width: "100%" }}>
               <Nav>
+                {userInfo.id && 
+                (<Nav.Item>
+                  <Nav.Link href="/chat" style={{ paddingLeft: "10px", paddingRight: "10px" }}>Messages</Nav.Link>
+                </Nav.Item>)}
                 {userInfo &&(
                 <Nav.Item>
                 <Nav.Link href="/chat" style={{ paddingLeft: "10px", paddingRight: "10px" }}>Messages</Nav.Link>

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { logout, userUpdateProfileAction } from "../actions/userActions";
+import { userUpdateProfileAction } from "../actions/userActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { Row, Form, Col, Button } from 'react-bootstrap'
@@ -12,13 +12,7 @@ const UserProfileScreen = ({history}) => {
     const dispatch = useDispatch()
 
     const userLogin = useSelector(state => state.userLogin)
-    const { userInfo } = userLogin
-
-    const userDetails = useSelector(state => state.userDetails)
-    const {user, loading, error} = userDetails
-
-    const userUpdate = useSelector(state => state.userUpdate)
-    const { success } = userUpdate
+    const { userInfo, loading, error } = userLogin
 
     const [firstName,setFirstName] = useState(userInfo.firstName)
     const [lastName,setLastName] = useState(userInfo.lastName)
@@ -28,15 +22,13 @@ const UserProfileScreen = ({history}) => {
     const [message,setMessage] = useState(null)
     const [image, setImage] = useState(null)
     const [imageUrl, setImageUrl] = useState(userInfo.imageUrl)
+    const [servicesOffered, setServicesOffered] = useState(userInfo.servicesOffered)
 
     useEffect(() => {
         if(!userInfo){
             history.push('/login')
         }
-        if(success){
-            dispatch(logout())
-        }
-    }, [dispatch, history, userInfo, success])
+    }, [dispatch, history, userInfo])
 
     const uploadImage = async (e) => {
         e.preventDefault()
@@ -63,10 +55,8 @@ const UserProfileScreen = ({history}) => {
             setMessage('Passwords do not match')
         }
         else{
-            dispatch(userUpdateProfileAction(userInfo.id, firstName, lastName, email, password, imageUrl))
-            if(success){
-                dispatch(logout())
-            }
+            dispatch(userUpdateProfileAction(userInfo.id, firstName, lastName, email, password, imageUrl, servicesOffered))
+            history.push('/')
         }
     }
 
@@ -109,6 +99,10 @@ const UserProfileScreen = ({history}) => {
                                 <Form.Label> Confirm Password:</Form.Label>
                                 <Form.Control type="password" placeholder="Confirm your password" value={confirmPassword} onChange={(e)=>setConfirmPassword(e.target.value)}></Form.Control>
                             </Form.Group>
+                            {userInfo.freelancer && <Form.Group controlId='ServicesOffered'>
+                                <Form.Label> Services Offered:</Form.Label>
+                                <Form.Control type="text" placeholder="Services Offered" value={servicesOffered} onChange={(e)=>setServicesOffered(e.target.value)}></Form.Control>
+                            </Form.Group>}
                             <Button type='submit'variant="primary">
                                 Update
                             </Button>

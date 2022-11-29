@@ -1,11 +1,12 @@
 import React, { useEffect } from 'react'
 import { useDispatch, useSelector } from "react-redux";
 import { Link } from 'react-router-dom'
-import { Row, Col, Image, ListGroup, Button } from 'react-bootstrap'
+import { Row, Col, Image, ListGroup, Button,  } from 'react-bootstrap'
 import Rating from "../components/Rating";
 import {  getFreelancerDetails } from "../actions/userActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
+import no_image  from '../no_image.jpg';
 
 const FreelancerScreen = ({match}) => {
 
@@ -33,7 +34,9 @@ const FreelancerScreen = ({match}) => {
             { loading ? <Loader /> : error ? <Message>{error}</Message> : (
                 <Row>
                     <Col md={6}>
-                        <Image src={freelancer.imageUrl} alt={freelancer.firstName} fluid/>
+                        { freelancer.imageUrl ? (<Image src={freelancer.imageUrl} alt={freelancer.firstName} fluid/>):(
+                            <Image src={no_image} fluid/>
+                        )}
                     </Col>
                     <Col md={6}>
                         <ListGroup variant='flush'>
@@ -41,10 +44,16 @@ const FreelancerScreen = ({match}) => {
                                 <h2>{freelancer.firstName}</h2>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                <Rating rating={freelancer.firstName} numreviews={freelancer.firstName}/>
+                                <Rating rating={'4.4'} numreviews={'5'}/>
                             </ListGroup.Item>
                             <ListGroup.Item>
-                                Description: {freelancer.firstName}
+                                Description: {freelancer.servicesOffered}
+                            </ListGroup.Item>
+                            <ListGroup.Item>
+                                Email: {freelancer.email}
+                            </ListGroup.Item>
+                            <ListGroup.Item>
+                                Contact: {freelancer.phoneNumber}
                             </ListGroup.Item>
                             <ListGroup.Item>
                                 <Button className='btn-block' type='button'>

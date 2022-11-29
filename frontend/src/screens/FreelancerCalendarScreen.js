@@ -11,6 +11,7 @@ import {getFreelancerVacantSlots, userRequestAppointment} from "../actions/Calen
 import {Link} from "react-router-dom";
 import Loader from "../components/Loader";
 import UserModal from "../components/UserModal"
+import {getFreelancerDetails} from "../actions/userActions";
 
 const localizer = momentLocalizer(moment);
 const DnDCalendar = withDragAndDrop(Calendar);
@@ -46,6 +47,12 @@ const FreelancerCalendarScreen = ({match}) => {
     useEffect(() => {
         dispatch(getFreelancerVacantSlots(match.params.id))
     }, [match, dispatch])
+
+    useEffect(() => {
+        if(!freelancer){
+            dispatch(getFreelancerDetails(match.params.id));
+        }
+    },[match, dispatch])
 
     const [eventSelected, setEventSelected] = useState(false)
 

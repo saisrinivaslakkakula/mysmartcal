@@ -7,7 +7,6 @@ import Homescreen from './screens/Homescreen'
 import CalendarScreen from './screens/Calendar'
 import Loginscreen from './screens/loginScreen'
 import Registerscreen from './screens/registerScreen'
-import ProfileScreen from './screens/profileScreen'
 import UserProfileScreen from "./screens/UserProfileScreen";
 import FreelancersScreen from "./screens/FreelancersScreen";
 import FreelancerScreen from "./screens/FreelancerScreen";
@@ -15,9 +14,11 @@ import FreelancerCalendarScreen from "./screens/FreelancerCalendarScreen";
 import Dashboard from './screens/Dashboard'
 import {BrowserRouter as Router, Route} from 'react-router-dom'
 import { CometChat } from "@cometchat-pro/chat";
-import {CometChatUI} from "./cometchat-pro-react-ui-kit/CometChatWorkspace/src";
 import { APP_ID, REGION } from './constants/ComeChatConstants'
+import {CometChatUI} from "./cometchat-pro-react-ui-kit/CometChatWorkspace/src"
+import ChatScreen from './screens/ChatScreen'
 const appSetting = new CometChat.AppSettingsBuilder().subscribePresenceForAllUsers().setRegion(REGION).build();
+
 CometChat.init(APP_ID, appSetting).then(
   () => {
     console.log("Initialization completed successfully");
@@ -45,7 +46,7 @@ const App = () => {
         <Route path='/freelancers' component={FreelancersScreen}/>
         <Route path='/freelancer/:id' component={FreelancerScreen}/>
         <Route path='/freelancerCalendar/:id' component={FreelancerCalendarScreen} />
-        <Route path='/chat' component={CometChatUI}/>
+        <Route path="/chat" component={ChatScreen} />
         {userInfo? userInfo.freelancer? <Route path='/' exact component={Dashboard}/> : <Route path='/' exact component={FreelancersScreen}/> : <Route path='/' exact component={Homescreen}/> }
       </Container>
     </main>
