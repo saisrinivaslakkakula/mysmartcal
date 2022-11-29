@@ -247,6 +247,13 @@ export const getAllFreelancers = () => async (dispatch, getState) => {
 export const logout = () => (dispatch) => {
     localStorage.removeItem('userInfo')
     localStorage.removeItem('calendarSlots')
+    CometChat.logout().then(
+        () => {
+          console.log("Logout completed successfully");
+        },error=>{
+          console.log("Logout failed with exception:",{error});
+        }
+    );
     dispatch({
         type: USER_LOGOUT
     })
