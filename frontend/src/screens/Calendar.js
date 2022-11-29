@@ -3,10 +3,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Calendar, momentLocalizer } from "react-big-calendar";
 import moment from "moment";
 import withDragAndDrop from "react-big-calendar/lib/addons/dragAndDrop";
-import { Link } from 'react-router-dom'
 import { Row, Button, Container, Modal } from 'react-bootstrap'
 import * as allIcons from "react-icons/all"
-import Loader from '../components/Loader'
 import Message from '../components/Message'
 import "react-big-calendar/lib/addons/dragAndDrop/styles.css";
 import "react-big-calendar/lib/css/react-big-calendar.css";

@@ -1,6 +1,6 @@
 import React, {useEffect, useState} from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { logout, userUpdateProfileAction } from "../actions/userActions";
+import { userUpdateProfileAction } from "../actions/userActions";
 import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { Row, Form, Col, Button } from 'react-bootstrap'
@@ -28,7 +28,7 @@ const UserProfileScreen = ({history}) => {
         if(!userInfo){
             history.push('/login')
         }
-    }, [dispatch, history])
+    }, [dispatch, history, userInfo])
 
     const uploadImage = async (e) => {
         e.preventDefault()
