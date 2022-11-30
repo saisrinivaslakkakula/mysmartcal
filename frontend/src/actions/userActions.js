@@ -11,7 +11,6 @@ import {
     FREELANCER_DETAILS_SUCCESS,
     FREELANCER_DETAILS_FAIL, USER_UPDATE_PROFILE_FAIL, USER_UPDATE_PROFILE_REQUEST, USER_UPDATE_PROFILE_SUCCESS
 } from '../constants/userConstants'
-import { CometChat } from "@cometchat-pro/chat";
 import axios from 'axios'
 import { AUTH_KEY } from '../constants/ComeChatConstants'
 import { CometChat } from "@cometchat-pro/chat";
@@ -23,7 +22,7 @@ export const login = (email, password) => async (dispatch) => {
         })
         const config = {
             headers: {
-                'Content-Type':  'application/json'
+                'Content-Type': 'application/json'
             }
         }
         //console.log(config)
@@ -63,11 +62,30 @@ export const register = (firstName, lastName, email, phoneNumber, password, Addr
             }
         }
         console.log(isFreeLancer)
-        const {data} = await axios.post('/api/user/add/',{firstName, lastName, email, phoneNumber,password, address:Address, isFreelancer:isFreeLancer, imageUrl},config)
-        
-         dispatch({
-            type : USER_REGISTER_SUCCESS,
-            payload:data,
+        const { data } = await axios.post('/api/user/add/', { firstName, lastName, email, phoneNumber, password, address: Address, isFreelancer: isFreeLancer, imageUrl }, config)
+        const uid = data.id
+        const name = data.firstName + " " + data.lastName
+        var user = new CometChat.User(uid);
+        user.setName(name);
+        CometChat.createUser(user, AUTH_KEY).then(
+            user => {
+                console.log("user created", user);
+                CometChat.login(uid, AUTH_KEY).then(
+                    user => {
+                        console.log("Login Successful:", { user });
+                    },
+                    error => {
+                        console.log("Login failed with exception:", { error });
+                    }
+                );
+            }, error => {
+                console.log("error", error);
+            }
+        )
+
+        dispatch({
+            type: USER_REGISTER_SUCCESS,
+            payload: data,
         })
         dispatch({
             type: USER_LOGIN_SUCCESS,
@@ -231,9 +249,9 @@ export const logout = () => (dispatch) => {
     localStorage.removeItem('calendarSlots')
     CometChat.logout().then(
         () => {
-          console.log("Logout completed successfully");
-        },error=>{
-          console.log("Logout failed with exception:",{error});
+            console.log("Logout completed successfully");
+        }, error => {
+            console.log("Logout failed with exception:", { error });
         }
     );
     dispatch({

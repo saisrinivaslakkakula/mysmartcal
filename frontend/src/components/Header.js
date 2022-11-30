@@ -165,10 +165,6 @@ const Header = ({history}) => {
                 (<Nav.Item>
                   <Nav.Link href="/chat" style={{ paddingLeft: "10px", paddingRight: "10px" }}>Messages</Nav.Link>
                 </Nav.Item>)}
-                {userInfo &&(
-                <Nav.Item>
-                <Nav.Link href="/chat" style={{ paddingLeft: "10px", paddingRight: "10px" }}>Messages</Nav.Link>
-              </Nav.Item>)}
                 {userInfo.freelancer ?
                   (<Nav.Item>
                     <Nav.Link href="/" style={{ paddingLeft: "10px", paddingRight: "10px" }}>Dashboard</Nav.Link>
