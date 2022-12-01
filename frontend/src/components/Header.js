@@ -9,7 +9,7 @@ import SockJsClient from 'react-stomp';
 import axios from 'axios'
 import { freeLancerApproveSlot, freeLancerRejectSlot } from '../actions/CalendarActions'
 
-const SOCKET_URL = 'http://54.237.48.142:8080/ws-chat/';
+const SOCKET_URL = 'http://100.25.48.11:8080/ws-chat/';
 const Header = ({history}) => {
   const [notificationCount, setNotificationCount] = useState(0);
   const [messages, setMessages] = useState([]);

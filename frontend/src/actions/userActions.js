@@ -17,6 +17,7 @@ import { CometChat } from "@cometchat-pro/chat";
 
 export const login = (email, password) => async (dispatch) => {
     try {
+        //console.log("Env: ", process.env.REACT_APP_SERVER_URL)
         dispatch({
             type: USER_LOGIN_REQUEST
         })
