@@ -337,16 +337,19 @@ public class calendarService {
         boolean FreelancerUpdated = false;
         boolean UserUpdated = false;
         // remove slot from freelancer appointments given
-        if(freelancerCalendar.getAppointmentsGiven().removeIf(slot -> slot.getSlotId().trim().equals(slotId.trim()))) FreelancerUpdated = true;
+        if(freelancerCalendar.getAppointmentsGiven().removeIf(slot -> slot.getSlotId().trim().equals(slotId.trim()))){
+            for (CalendarSlot slot : freelancerCalendar.getVacantSlots()) {
+                if (slot.getSlotId().trim().equals(slotId.trim())) {
+                    slot.setStatus("Vacant");
+                }
+            }
+            calendarRepository.save(freelancerCalendar);
+            FreelancerUpdated = true;
+        }
         // romove slot from user appointments taken
         if(calendar.getAppointmentsTaken().removeIf(slot -> slot.getSlotId().trim().equals(slotId.trim()))) UserUpdated = true;
         // iterate through freelancer calendar vacant slots and update the status of the slot to Vacant
-        for (CalendarSlot slot : freelancerCalendar.getVacantSlots()) {
-            if (slot.getSlotId().trim().equals(slotId.trim())) {
-                slot.setStatus("Vacant");
-                FreelancerUpdated = true;
-            }
-        }
+
 
         if(FreelancerUpdated && UserUpdated){
             // get freelancer notifications

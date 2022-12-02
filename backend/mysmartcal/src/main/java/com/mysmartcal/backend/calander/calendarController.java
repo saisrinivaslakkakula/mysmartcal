@@ -26,10 +26,6 @@ public class calendarController {
     @Autowired
     private KafkaTemplate<String, NotificationMessage> kafkaTemplate;
 
-    @GetMapping("/")
-    public String home(){
-        return "Welocme to MysmartCal";
-    }
 
     @PostMapping("/addVacantSlot")
     public Object addVacantSlot(@RequestBody AddVacantCalendarSlotRequestBody calendarSlotRequestBody) {
