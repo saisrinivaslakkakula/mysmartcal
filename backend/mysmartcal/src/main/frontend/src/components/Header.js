@@ -9,7 +9,7 @@ import SockJsClient from 'react-stomp';
 import axios from 'axios'
 import {freeLancerApproveSlot, freeLancerRejectSlot} from '../actions/CalendarActions'
 
-const SOCKET_URL = 'http://100.25.48.11:8080/ws-chat/';
+const SOCKET_URL = 'http://localhost:8080/ws-chat/';
 const Header = ({history}) => {
     const [notificationCount, setNotificationCount] = useState(0);
     const [messages, setMessages] = useState([]);
@@ -56,9 +56,10 @@ const Header = ({history}) => {
 
 
     const onMessageReceived = (msg) => {
-        console.log('New Message Received!!', msg);
+        //console.log('New Message Received!!', msg);
         // concat message only if message id is not already present in the state
         if (!messages.some(message => message.id === msg.id) && msg.receiverId === userInfo.id) {
+            console.log("New Message Received!!", msg);
             setMessages(messages.concat(msg));
             setNotificationCount(notificationCount + 1)
         }
