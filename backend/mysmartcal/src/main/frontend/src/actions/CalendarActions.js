@@ -198,7 +198,7 @@ export const userRequestAppointment = (calendarSlot ,userId,freelancerId) => asy
         }
     }
 
-    const { data } = await axios.post(`http://localhost:8080/api/calendar/userRequestAppointmentKafka`, { calendarSlot, userId, freelancerId }, config)
+    const { data } = await axios.post(`/api/calendar/userRequestAppointmentKafka`, { calendarSlot, userId, freelancerId }, config)
 
     dispatch({
         type: FREELANCER_REQUEST_SLOT,
