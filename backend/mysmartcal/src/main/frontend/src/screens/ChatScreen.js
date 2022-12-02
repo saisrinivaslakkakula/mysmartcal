@@ -11,10 +11,9 @@ const ChatScreen = () => {
 // user is getting authenticated in cometchat once my app is asking for login to my app.
 
   return (
-    <div>
-        <CometChatUI />
-    </div>
-    
+        <div style={{ width: '800px', height: '800px' }}>
+            <CometChatUI />
+        </div>
   )
 }
 

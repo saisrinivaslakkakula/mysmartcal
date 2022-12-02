@@ -134,6 +134,7 @@ export const UserremoveConfirmedSlot = (userId, slotId,status) => async (dispatc
     //console.log("slotId",slotId);
     const { data } = await axios.delete(`api/calendar/userRemoveConfirmedSlot?userId=${userId}&slotId=${slotId}&status=${status}`)
     //console.log("data",data);
+
     dispatch({
         type: CALENDAR_REMOVE_SLOT,
         payload: slotId
@@ -180,6 +181,24 @@ localStorage.setItem('calendarSlots', JSON.stringify(getState().calendarSlots.ca
 export const freeLancerApproveSlot = (slotId,userId,freelancerId) => async (dispatch, getState) => {
     const { data } = await axios.get(`api/calendar/freeLancerApproveAppointment?userId= ${userId}&slotId=${slotId}&freelancerId=${freelancerId}`)
     console.log("data",data);
+
+    const headers = {
+        apiKey: 'be4144dd06552d336abb9081793ac4a17b4085c2',
+            'Content-Type': 'application/json',
+            Accept: 'application/json',
+            onBehalfOf: freelancerId
+
+    }
+    const messageForUser = "Hi! Your appointment has been confirmed with me. Please check your calendar for more details."
+    const body=  JSON.stringify({
+        category: 'message',
+        type: 'text',
+        data: {text: messageForUser, metadata: {key1: 'value1', key2: 'value2'}},
+        receiver: userId,
+        receiverType: 'user'
+    })
+    const {messageData} = await axios.post('https://226511b01edc0d87.api-us.cometchat.io/v3/messages',body,{headers:headers})
+    console.log("messageData",messageData);
     dispatch({
         type: FREELANCER_APPROVE_SLOT,
         payload: data
