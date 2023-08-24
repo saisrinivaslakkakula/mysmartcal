@@ -1,5 +1,5 @@
 
-###MySmart Cal - A cloud-based public calendar
+### MySmart Cal - A cloud-based public calendar
 Time is precious. People who value time should always try their best to improve
 their productivity. Be it a freelancing activity or free community service, it is often difficult
 for people offering the services to coordinate the right time window and location with the
